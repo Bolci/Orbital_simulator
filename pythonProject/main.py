@@ -1,9 +1,11 @@
 import numpy as np
 import matplotlib.pyplot as plt
 from skyfield.api import load
+from scipy.spatial.transform import Rotation as R
 
+from quaternion_worker import QuaternionMath
 from tle_worker import TLEWorker
-from objects import Sphere
+from objects import Sphere, Sun
 from sattellites import SatteliteActive, SatteliteWithDimension
 from instruments import Camera, LaserAltimeter
 from utils import Utils
@@ -21,14 +23,15 @@ if __name__ == "__main__":
     raan = np.radians(52)  # RAAN in radians
 
     # Artificial TLE of dummy sattelite on Sun-sychnronus orbit
-    altitude2 = 750  # Satellite altitude in km
-    inclination2 = np.radians(98.1)  # Inclination in radians
+    altitude2 = 850  # Satellite altitude in km
+    inclination2 = np.radians(95.1)  # Inclination in radians
     raan2 = np.radians(52)  # RAAN in radians
-    dimensions_of_satt_2 = 0.050
+    dimensions_of_satt_2 = 0.050 #in meters
 
     # Camera parameters
-    sensor_resolution = (4112, 2176)
-    fov_deg = (2.37, 1.23)
+    sensor_resolution = (2176, 4112)
+    fov_deg = (1.23,2.37)
+    fps = 1
 
     # get_sattelites_TLE
 
@@ -45,13 +48,15 @@ if __name__ == "__main__":
                                                     raan=raan2)
 
     # Load timescale
+    max_simulation_time = 90 #in minutes
     ts = load.timescale()
     t0 = ts.now()
-    minutes = np.linspace(0, 90, 500)  # Simulate over 90 minutes (approx one orbit)
+    minutes = np.linspace(0, max_simulation_time, max_simulation_time*fps)
     times = t0 + minutes / (24 * 60)  # Convert minutes to fraction of a day
 
-    # get planes
+    # get objetcs
     earth = Sphere.get_planet(earth_radius)
+    Sun = Sun()
 
     # get sattelites
     measured_sattelite = SatteliteWithDimension('Dummy_sattelite', dimensions_of_satt_2)
@@ -61,7 +66,11 @@ if __name__ == "__main__":
     measurement_sattelite.load_sattelite(tle_measurement_sat, ts)
 
     # generate instruments
-    camera_orientation = [-30.623567051375606, -17.353989865522664, 0]  # yaw, pitch, roll
+    #camera_orientation = [1,0,0] #pointign vec
+    #isntrument_sattelite_initial_orientation = [0,0,0] #yaw, pitch, roll
+    #r = R.from_euler('zyx', isntrument_sattelite_initial_orientation)
+    #init_sattelite_quaternion = r.as_quat()
+    #measurement_sattelite.set_rotation_quaternion(init_sattelite_quaternion)
 
     camera = Camera(sensor_resolution=sensor_resolution,
                     fov_deg=fov_deg)
@@ -70,10 +79,11 @@ if __name__ == "__main__":
     camera.assign_sattelite(measurement_sattelite)
     laser_altimeter.assign_sattelite(measurement_sattelite)
 
-    camera.set_rotation(np.array(camera_orientation))
+    #camera.set_rotation(np.asarray(camera_orientation))
 
-    measurement_sattelite.add_intruments(camera)
-    measurement_sattelite.add_intruments(laser_altimeter)
+    measurement_sattelite.add_intruments('Camera', camera)
+    measurement_sattelite.add_intruments('Laser_atimeter', laser_altimeter)
+
 
     x_vals = []
     y_vals = []
@@ -83,16 +93,23 @@ if __name__ == "__main__":
     y_vals2 = []
     z_vals2 = []
 
+    active_orientation_axis_x = []
+    active_orientation_axis_y = []
+    active_orientation_axis_z = []
+
     counter = 0
+
+    image_all = np.zeros(sensor_resolution, dtype=np.uint8)
 
     for id_t, t in enumerate(times):
         sattelite_measurement_possition = measurement_sattelite.at(t)
         sattelite_dummy_possition = measured_sattelite.at(t)
 
-        # yaw, pitch, roll = compute_camera_angles_with_roll(sattelite_measurement_possition, sattelite_dummy_possition)
+        sun_position = Sun.get_sun_position(t)
 
         measured_objects = [measured_sattelite]
         measured_data = measurement_sattelite.perform_measurements(measured_objects)
+        measurement_sattelite.orient_instrument_on_satellite('Camera', sattelite_dummy_possition)
 
         x_vals.append(sattelite_measurement_possition[0])
         y_vals.append(sattelite_measurement_possition[1])
@@ -102,42 +119,63 @@ if __name__ == "__main__":
         y_vals2.append(sattelite_dummy_possition[1])
         z_vals2.append(sattelite_dummy_possition[2])
 
-        if counter >= 10:
+        active_orientation_axis_x.append(measurement_sattelite.get_x_axis)
+        active_orientation_axis_y.append(measurement_sattelite.get_y_axis)
+        active_orientation_axis_z.append(measurement_sattelite.get_z_axis)
+
+        image_all += measured_data['Camera']
+
+
+        if counter >= 100:
             break
 
         counter += 1
+
+    plt.figure()
+    plt.imshow(image_all)
 
     fig = plt.figure(figsize=(10, 10))
     ax = fig.add_subplot(111, projection='3d')
 
     ax.plot(x_vals, y_vals, z_vals, label="Satellite with intruments")
-    ax.plot(x_vals2, y_vals2, z_vals2, '*', label="Dummy sattelite")
-    # ax.plot_surface(*earth.get_planet(), color='b', alpha=0.5)
+    ax.plot(x_vals2, y_vals2, z_vals2, 'magenta', label="Dummy sattelite")
+    ax.plot_surface(*earth, color='b', alpha=0.1)
     ax.set_xlabel('X (km)')
     ax.set_ylabel('Y (km)')
     ax.set_zlabel('Z (km)')
     ax.set_title("3D Orbit of Satellite")
 
+    '''
     for id_x in range(len(x_vals)):
         if id_x % 10 == 0:
             ax.plot([x_vals[id_x], x_vals2[id_x]], [y_vals[id_x], y_vals2[id_x]], [z_vals[id_x], z_vals2[id_x]])
+    '''
 
-    vec_len = 10
+    x_axis = np.array([1, 0, 0])
+    y_axis = np.array([0, 1, 0])
+    z_axis = np.array([0, 0, 1])
 
     for id_x in range(len(x_vals)):
-
         if id_x % 10 == 0:
-            vec_end = Utils.yaw_pitch_roll_to_vector(*camera_orientation, vec_len)
-            ax.quiver(x_vals[id_x], y_vals[id_x], z_vals[id_x], vec_end[0], vec_end[1], vec_end[2], length=vec_len,
-                      color='r')
 
-        if id_x % 10 == 0:
-            translated_point = [x_vals2[id_x] - x_vals[id_x], y_vals2[id_x] - y_vals[id_x],
-                                z_vals2[id_x] - z_vals[id_x]]
-            rotated_point = Utils.compute_rotation_matrix_in_3D(*camera_orientation) @ translated_point
+            sattelite_dummy_possition = [x_vals2[id_x], y_vals2[id_x], z_vals2[id_x]]
+            sattelite_mess_possition = [x_vals[id_x], y_vals[id_x], z_vals[id_x]]
 
-            ax.quiver(x_vals[id_x], y_vals[id_x], z_vals[id_x], *rotated_point, length=vec_len, color='b')
+
+            ax.quiver(x_vals[id_x], y_vals[id_x], z_vals[id_x], *active_orientation_axis_x[id_x], length=1000,
+                      color='r', normalize=True)
+
+            ax.quiver(x_vals[id_x], y_vals[id_x], z_vals[id_x], *active_orientation_axis_y[id_x], length=1000,
+                      color='b', normalize=True)
+
+            ax.quiver(x_vals[id_x], y_vals[id_x], z_vals[id_x], *active_orientation_axis_z[id_x], length=1000,
+                      color='g', normalize=True)
+
+            #ax.plot([x_vals[id_x], x_vals2[id_x]], [y_vals[id_x], y_vals2[id_x]], [z_vals[id_x], z_vals2[id_x]], 'magenta')
+
 
     plt.legend()
     plt.show()
+
+
 

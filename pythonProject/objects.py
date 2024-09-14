@@ -25,11 +25,13 @@ class Sphere:
         return x_p, y_p, z_p
 
 
-class Sun():
+class Sun:
     def __init__(self):
         self.sun = load('de421.bsp')['sun']
 
-    def get_relative_position_to_sun(self, sattelite_position):
-        sun_position = self.sun.at(t).position.km
+    def get_sun_position(self, t):
+        return self.sun.at(t).position.km
 
+    def get_relative_position_to_sun(self, t, sattelite_position):
+        sun_position = self.get_sun_position(t)
         return sun_position - sattelite_position

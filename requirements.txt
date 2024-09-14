@@ -3,3 +3,4 @@ matplotlib
 skyfield
 sgp4
 opencv-python
+scipy
