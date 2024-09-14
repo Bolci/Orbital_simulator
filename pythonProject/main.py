@@ -32,6 +32,7 @@ if __name__ == "__main__":
     sensor_resolution = (2176, 4112)
     fov_deg = (1.23,2.37)
     fps = 1
+    conversion = 1
 
     # get_sattelites_TLE
 
@@ -51,7 +52,7 @@ if __name__ == "__main__":
     max_simulation_time = 90 #in minutes
     ts = load.timescale()
     t0 = ts.now()
-    minutes = np.linspace(0, max_simulation_time, max_simulation_time*fps)
+    minutes = np.linspace(0, max_simulation_time, max_simulation_time*fps*conversion)
     times = t0 + minutes / (24 * 60)  # Convert minutes to fraction of a day
 
     # get objetcs
@@ -108,8 +109,9 @@ if __name__ == "__main__":
         sun_position = Sun.get_sun_position(t)
 
         measured_objects = [measured_sattelite]
-        measured_data = measurement_sattelite.perform_measurements(measured_objects)
         measurement_sattelite.orient_instrument_on_satellite('Camera', sattelite_dummy_possition)
+        measured_data = measurement_sattelite.perform_measurements(measured_objects)
+
 
         x_vals.append(sattelite_measurement_possition[0])
         y_vals.append(sattelite_measurement_possition[1])
@@ -126,7 +128,7 @@ if __name__ == "__main__":
         image_all += measured_data['Camera']
 
 
-        if counter >= 100:
+        if counter >= 10:
             break
 
         counter += 1

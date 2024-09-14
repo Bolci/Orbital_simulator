@@ -15,9 +15,9 @@ class SatteliteDummy:
         self.satellite_my = None
         self.orientation_quaternion = orientation_quaternion
 
-        self.x_axis = np.array([1, 0, 0 ])
-        self.y_axis = np.array([0, 1, 0])
-        self.z_axis = np.array([0, 0, 1])
+        self.x_axis = np.array([1, 0, 0 ], dtype=np.float32)
+        self.y_axis = np.array([0, 1, 0], dtype=np.float32)
+        self.z_axis = np.array([0, 0, 1], dtype=np.float32)
 
     @property
     def get_x_axis(self):
@@ -69,7 +69,6 @@ class SatteliteDummy:
 
         geocentric = self.satellite_my.at(t)
         exact_position = geocentric.position.km
-        print(f"extract possition = {exact_position}")
         self.position_vector = copy(exact_position)
 
         return geocentric, exact_position
@@ -168,17 +167,19 @@ class SatteliteActive(SatteliteDummy):
         target_vector = target_point_vector - self.get_current_position()
         target_vector = Utils.get_unit_vector(target_vector)  # Normalize the vector
 
-        new_x_axis = target_vector
+        new_z_axis = target_vector
 
-        new_z_axis = np.array([0,  0, 1])  # Start with the global z-axis
-        if np.allclose(np.cross(new_x_axis, new_z_axis), [0, 0, 0]):
-            new_z_axis = np.array([0, 1, 0])
+
+
+        new_y_axis = np.array([0, 0, 1]).astype(np.float64) # Start with the global z-axis
+        if np.allclose(np.cross(new_z_axis, new_y_axis), [0, 0, 0]):
+            new_y_axis = np.array([0, 1, 0])
+
+        new_x_axis = np.cross(new_y_axis, new_z_axis)
+        new_x_axis /= np.linalg.norm(new_x_axis)
 
         new_y_axis = np.cross(new_z_axis, new_x_axis)
         new_y_axis /= np.linalg.norm(new_y_axis)
-
-        new_z_axis = np.cross(new_x_axis, new_y_axis)
-        new_z_axis /= np.linalg.norm(new_z_axis)
 
         self.x_axis = new_x_axis
         self.y_axis = new_y_axis
