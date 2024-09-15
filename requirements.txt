@@ -4,3 +4,5 @@ skyfield
 sgp4
 opencv-python
 scipy
+astropy
+poliastro

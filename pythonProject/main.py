@@ -6,7 +6,7 @@ from scipy.spatial.transform import Rotation as R
 from quaternion_worker import QuaternionMath
 from tle_worker import TLEWorker
 from objects import Sphere, Sun
-from sattellites import SatteliteActive, SatteliteWithDimension
+from sattellites import SatteliteActive, SatteliteObject
 from instruments import Camera, LaserAltimeter
 from utils import Utils
 
@@ -24,7 +24,7 @@ if __name__ == "__main__":
 
     # Artificial TLE of dummy sattelite on Sun-sychnronus orbit
     altitude2 = 850  # Satellite altitude in km
-    inclination2 = np.radians(95.1)  # Inclination in radians
+    inclination2 = np.radians(93.1)  # Inclination in radians
     raan2 = np.radians(52)  # RAAN in radians
     dimensions_of_satt_2 = 0.050 #in meters
 
@@ -49,7 +49,7 @@ if __name__ == "__main__":
                                                     raan=raan2)
 
     # Load timescale
-    max_simulation_time = 90 #in minutes
+    max_simulation_time = 120 #in minutes
     ts = load.timescale()
     t0 = ts.now()
     minutes = np.linspace(0, max_simulation_time, max_simulation_time*fps*conversion)
@@ -60,7 +60,7 @@ if __name__ == "__main__":
     Sun = Sun()
 
     # get sattelites
-    measured_sattelite = SatteliteWithDimension('Dummy_sattelite', dimensions_of_satt_2)
+    measured_sattelite = SatteliteObject('Dummy_sattelite', dimensions_of_satt_2)
     measured_sattelite.load_sattelite(tle_measurement_sat_2, ts)
 
     measurement_sattelite = SatteliteActive('Measurement_sattelite')
@@ -128,7 +128,7 @@ if __name__ == "__main__":
         image_all += measured_data['Camera']
 
 
-        if counter >= 10:
+        if counter >= 200:
             break
 
         counter += 1

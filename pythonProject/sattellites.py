@@ -5,6 +5,8 @@ from utils import Utils
 from quaternion_worker import QuaternionMath
 from scipy.spatial.transform import Rotation as R
 from copy import copy
+from astropy import units as u
+from poliastro.twobody import Orbit
 
 
 class SatteliteDummy:
@@ -92,7 +94,7 @@ class SatteliteWithDimension(SatteliteDummy):
 
         geocentric, exact_position = super().at(t)
 
-        return exact_position
+        return geocentric, exact_position
 
 
 class SatteliteObject(SatteliteWithDimension):
@@ -101,17 +103,33 @@ class SatteliteObject(SatteliteWithDimension):
                  position_degradation_speed_km=0.2,
                  drift_speed_km_per_sec=0.01,
                  initial_uncertainty_km=1.0,
+                 initial_velocity_uncertenaity_kms = 0.001,
                  radius = 0.05):
         super().__init__(label, radius)
 
-        self.position_degradation_speed_km = position_degradation_speed_km
+        self.initial_velocity_uncertenaity_kms = initial_velocity_uncertenaity_kms
+        self.initial_uncertainty_km = initial_uncertainty_km
+
 
         self.drift_speed_km_per_sec = drift_speed_km_per_sec
-        self.initial_uncertainty_km = initial_uncertainty_km
-        self.drift_velocity = np.random.uniform(-1, 1, size=3) * self.drift_speed_km_per_sec
+        self.position_degradation_speed_km = position_degradation_speed_km
 
-        self.initialized = False
-        self.initial_position_error = None
+    @staticmethod
+    def sample_from_uncertainity(parameter):
+        return np.random.uniform(-1, 1, size=3) * parameter
+
+    def load_sattelite(self, tle, ts):
+        super().load_sattelite(tle, ts)
+        ts_now = ts.now()
+        sattelite_my_now = self.satellite_my.at(ts_now)
+
+        position_km, velocity_kmps = sattelite_my_now.position.km, sattelite_my_now.velocity.km_per_s
+        position_error = self.sample_from_uncertainity(self.initial_uncertainty_km)
+        velocity_error = self.sample_from_uncertainity(self.initial_velocity_uncertenaity_kms)
+
+        print(f"position = {position_error}, velocity = {velocity_error}")
+        #self.satellite_my = EarthSatellite(*tle, self.label, ts)
+        #self.load_tle(tle)
 
     def get_tle_epoch(self):
         return self.satellite_my.epoch
@@ -119,34 +137,25 @@ class SatteliteObject(SatteliteWithDimension):
     def dt_time(self, t):
         return (t.tt - self.get_tle_epoch().tt)
 
+    '''
     def calculate_uncertainity(self, t):
         total_uncertainty_km = self.dt_time(t) * self.position_degradation_speed_km
         return max(0, total_uncertainty_km)
+    '''
 
-    def sample_initial_position_error(self):
-        u = np.random.uniform(0, 1)
-        v = np.random.uniform(0, 1)
-        theta = 2 * np.pi * u
-        phi = np.arccos(2 * v - 1)
-        r = self.initial_uncertainty_km * (np.random.uniform(0, 1) ** (1 / 3))  # Uniform distribution in a sphere
-
-        x = r * np.sin(phi) * np.cos(theta)
-        y = r * np.sin(phi) * np.sin(theta)
-        z = r * np.cos(phi)
-        return np.array([x, y, z])
 
     def at(self, t):
         if self.satellite_my is None:
             raise Exception("Satellite data not loaded")
 
-        uncertainty_km = self.calculate_uncertainity(t)
         tle_epoch = self.get_tle_epoch()  # Julian Date of TLE epoch
 
-        [geocentric, exact_position] = super().at(t)
+        geocentric, exact_position = super().at(t)
 
-        uncertainty = uncertainty_km * np.random.uniform(-1, 1, size=3)  # 3D uncertainty
-        uncertain_position = exact_position + uncertainty
+        #uncertainty = uncertainty_km * np.random.uniform(-1, 1, size=3)  # 3D uncertainty
+        #uncertain_position = exact_position + uncertainty
 
+        return exact_position
         return {
             'exact_position': exact_position,
             'uncertain_position': uncertain_position,
@@ -168,7 +177,6 @@ class SatteliteActive(SatteliteDummy):
         target_vector = Utils.get_unit_vector(target_vector)  # Normalize the vector
 
         new_z_axis = target_vector
-
 
 
         new_y_axis = np.array([0, 0, 1]).astype(np.float64) # Start with the global z-axis

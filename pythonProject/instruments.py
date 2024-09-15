@@ -109,9 +109,10 @@ class Camera(DummyIntrument):
                                            self.parent_sattelite.y_axis,
                                            self.parent_sattelite.z_axis))
 
+
         relative_position = np.dot(rotation_matrix.T, relative_position)
 
-        rotation_vector, _ = cv2.Rodrigues(rotation_matrix)
+        #relative_position = np.asarray([relative_position[0], relative_position[1]+100.0, relative_position[2]])
 
 
         rotation_vector = np.zeros((1,3), dtype=np.float32)
