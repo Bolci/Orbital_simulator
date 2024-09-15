@@ -1,11 +1,16 @@
 import numpy as np
 from datetime import datetime, timedelta
 from skyfield.api import load
+from astropy import units as u
+from poliastro.twobody import Orbit
+from poliastro.bodies import Earth
 
 
 class TLEWorker:
-  def __init__(self):
-    pass
+  def __init__(self, mu_earth = 398600.4418,
+               r_earth = 6378.1363):
+    self.mu_earth = mu_earth
+    self.r_earth = r_earth
 
   @staticmethod
   def orbital_period(semi_major_axis, mu):
@@ -36,12 +41,22 @@ class TLEWorker:
 
     return satellite_iss
 
+
+  def generate_tle_from_orbit_object(self, orbit):
+    # Extract the classical orbital elements
+    semi_major_axis = orbit.a.to(u.km)
+    eccentricity = orbit.ecc
+    inclination = orbit.inc.to(u.deg)
+    raan = orbit.raan.to(u.deg)
+    argp = orbit.argp.to(u.deg)
+    true_anomaly = orbit.nu.to(u.deg)
+
+    [line1, line2] = self.generate_tle()
+
   def generate_tle(self,
-                   r_earth,
                    altitude,
                    inclination,
                    raan,
-                   mu_earth = 398600.4418,
                    eccentricity = 0,
                    mean_motion_derivative = 0.0,
                    mean_motion_sec_derivative = 0.0,
@@ -53,9 +68,9 @@ class TLEWorker:
                    classification = 'U',
                    international_designator = '2022-999A'):
 
-    semi_major_axis = r_earth + altitude
+    semi_major_axis = self.r_earth + altitude
 
-    T = self.orbital_period(semi_major_axis, mu_earth) # Orbital period
+    T = self.orbital_period(semi_major_axis, self.mu_earth) # Orbital period
     mean_motion = self.mean_motion(T) # Mean motion (revs per day)
     epoch = self.get_epoch() # Epoch (current time)
 

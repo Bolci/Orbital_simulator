@@ -1,14 +1,12 @@
 import numpy as np
 import matplotlib.pyplot as plt
 from skyfield.api import load
-from scipy.spatial.transform import Rotation as R
 
-from quaternion_worker import QuaternionMath
 from tle_worker import TLEWorker
 from objects import Sphere, Sun
-from sattellites import SatteliteActive, SatteliteObject
+from sattelites.sattelite_active import SatteliteActive
+from sattelites.sattelite_object import SatteliteObject
 from instruments import Camera, LaserAltimeter
-from utils import Utils
 
 
 if __name__ == "__main__":
@@ -38,13 +36,11 @@ if __name__ == "__main__":
 
     tle_worker = TLEWorker()
 
-    tle_measurement_sat = tle_worker.generate_tle(r_earth=earth_radius,
-                                                  altitude=altitude,
+    tle_measurement_sat = tle_worker.generate_tle(altitude=altitude,
                                                   inclination=inclination,
                                                   raan=raan)
 
-    tle_measurement_sat_2 = tle_worker.generate_tle(r_earth=earth_radius,
-                                                    altitude=altitude2,
+    tle_measurement_sat_2 = tle_worker.generate_tle(altitude=altitude2,
                                                     inclination=inclination2,
                                                     raan=raan2)
 
