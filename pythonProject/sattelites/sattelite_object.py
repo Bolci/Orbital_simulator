@@ -36,52 +36,36 @@ class SatteliteObject(SatteliteWithDimension):
 
     def load_sattelite(self, tle, ts):
         super().load_sattelite(tle, ts)
-        ts_now = ts.now()
-        sattelite_my_now = self.satellite_my.at(ts_now)
-
-        position_km, velocity_kmps = sattelite_my_now.position.km, sattelite_my_now.velocity.km_per_s
-        position_error = self.sample_from_uncertainity(self.initial_uncertainty_km)
-        velocity_error = self.sample_from_uncertainity(self.initial_velocity_uncertenaity_kms)
-
-        initial_error_position = position_error + position_km
+        #ts_now = ts.now()
+        #sattelite_my_now = self.satellite_my.at(ts_now)
+        #position_km, velocity_kmps = sattelite_my_now.position.km, sattelite_my_now.velocity.km_per_s
+        #position_error = self.sample_from_uncertainity(self.initial_uncertainty_km)
+        #velocity_error = self.sample_from_uncertainity(self.initial_velocity_uncertenaity_kms)
+        #initial_error_position = position_error + position_km
         #initial_error_vector = velocity_error + velocity_kmps
-
-        mu_earth = 398600.4418
-        r_earth = 6378.1363
-
-        mean_motion_rev_per_day = self.satellite_my.model.nm
-
-        mean_motion_rad_per_sec = mean_motion_rev_per_day * (2 * np.pi) / (24 * 3600)
-
+        #mu_earth = 398600.4418
+        #r_earth = 6378.1363
+        #mean_motion_rev_per_day = self.satellite_my.model.nm
+        #mean_motion_rad_per_sec = mean_motion_rev_per_day * (2 * np.pi) / (24 * 3600)
         # Calculate the semi-major axis using the mean motion
-        semi_major_axis = (mu_earth / (mean_motion_rad_per_sec ** 2)) ** (1 / 3)
-
-        current_speed = np.sqrt(mu_earth * (2 / initial_error_position - 1 / semi_major_axis))
-        print(current_speed)
-
-        r = initial_error_position * u.km
-        v = velocity_kmps * u.km / u.s
-
+        #semi_major_axis = (mu_earth / (mean_motion_rad_per_sec ** 2)) ** (1 / 3)
+        #current_speed = np.sqrt(mu_earth * (2 / initial_error_position - 1 / semi_major_axis))
+        #print(current_speed)
+        #r = initial_error_position * u.km
+        #v = velocity_kmps * u.km / u.s
         # Create an orbit object using the true position and velocity relative to Earth
-        orbit = Orbit.from_vectors(Earth, r, v)
-
-
-
-        print(f"Position: {r}, Velocity: {v}")
-
-        r = np.array([r[0].to_value(u.km), r[1].to_value(u.km), r[2].to_value(u.km)])
-        v = np.array([v[0].to_value(u.km / u.s), v[1].to_value(u.km / u.s), v[2].to_value(u.km / u.s)])
-
-        orbital_energy = (Utils.norm(v) ** 2 / 2) - (mu_earth / Utils.norm(r))
-        print(F"orbital energy {orbital_energy}")
-
-        print(orbit.a, orbit.ecc, orbit.inc)
-
-        tle_creator = TLEWorker()
-        generated_tle = tle_creator.generate_tle_from_orbit_object(orbit)
-        print(generated_tle)
-        self.tle_true = generated_tle
-        self.satellite_my_true = EarthSatellite(*generated_tle, "_true", ts)
+        #orbit = Orbit.from_vectors(Earth, r, v)
+        #print(f"Position: {r}, Velocity: {v}")
+        #r = np.array([r[0].to_value(u.km), r[1].to_value(u.km), r[2].to_value(u.km)])
+        #v = np.array([v[0].to_value(u.km / u.s), v[1].to_value(u.km / u.s), v[2].to_value(u.km / u.s)])
+        #orbital_energy = (Utils.norm(v) ** 2 / 2) - (mu_earth / Utils.norm(r))
+        #print(F"orbital energy {orbital_energy}")
+        #print(orbit.a, orbit.ecc, orbit.inc)
+        #tle_creator = TLEWorker()
+        #generated_tle = tle_creator.generate_tle_from_orbit_object(orbit)
+        #print(generated_tle)
+        #self.tle_true = generated_tle
+        #self.satellite_my_true = EarthSatellite(*generated_tle, "_true", ts)
 
 
     def get_tle_epoch(self):
@@ -100,13 +84,14 @@ class SatteliteObject(SatteliteWithDimension):
 
         new_t = copy(t)
         _, expected_position = super().at(t)
-        exact_position = self.satellite_my_true.at(new_t).position.km
+        #exact_position = self.satellite_my_true.at(new_t).position.km
 
-        geocentric = self.satellite_my_true.at(new_t)
-        exact_position = geocentric.position.km
-
-
+        #geocentric = self.satellite_my_true.at(new_t)
+        #exact_position = geocentric.position.km
+        return expected_position
+        '''
         return {
             'exact_position': exact_position,
             'uncertain_position': expected_position,
         }
+        '''

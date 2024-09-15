@@ -33,6 +33,9 @@ if __name__ == "__main__":
     fps = 1
     conversion = 1
 
+    #laser altimeter parameters
+    laser_divergence = 2e-5 #rad
+
     # get_sattelites_TLE
 
     tle_worker = TLEWorker()
@@ -72,7 +75,7 @@ if __name__ == "__main__":
 
     camera = Camera(sensor_resolution=sensor_resolution,
                     fov_deg=fov_deg)
-    laser_altimeter = LaserAltimeter()
+    laser_altimeter = LaserAltimeter(beam_divergence = laser_divergence)
 
     camera.assign_sattelite(measurement_sattelite)
     laser_altimeter.assign_sattelite(measurement_sattelite)
