@@ -52,5 +52,5 @@ noise_level = 0.05  # simulate some noise
 signals = laser_altimeter_gaussian(target_distance, "",beam_diameter, pulse_length, object_size, noise_level)
 
 # Analyze the results
-for signal in signals:
-    print(f"Signal strength: {signal[0]}, Time of flight: {signal[1]}")
+#for signal in signals:
+#    print(f"Signal strength: {signal[0]}, Time of flight: {signal[1]}")

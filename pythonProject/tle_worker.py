@@ -47,7 +47,7 @@ class TLEWorker:
 
 
     altitude = orbit.a.to_value(u.km) - self.r_earth
-    print(altitude)
+    #print(altitude)
     eccentricity = orbit.ecc
     inclination = orbit.inc.to_value(u.deg)
     raan = orbit.raan.to_value(u.deg)

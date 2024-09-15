@@ -79,10 +79,9 @@ class SatteliteObject(SatteliteWithDimension):
         if self.satellite_my is None:
             raise Exception("Satellite data not loaded")
 
-        if self.satellite_my_true is None:
-            raise Exception("True sattelite data are not generated")
-
-        new_t = copy(t)
+        #if self.satellite_my_true is None:
+        #    raise Exception("True sattelite data are not generated")
+        #new_t = copy(t)
         _, expected_position = super().at(t)
         #exact_position = self.satellite_my_true.at(new_t).position.km
 

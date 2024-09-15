@@ -83,6 +83,8 @@ if __name__ == "__main__":
     measurement_sattelite.add_intruments('Camera', camera)
     measurement_sattelite.add_intruments('Laser_atimeter', laser_altimeter)
 
+    measurement_sattelite.set_intrument_orientation_relative_to_sattelite('Camera', np.array([0.,0.,1.]))
+
 
     x_vals = []
     y_vals = []
@@ -103,9 +105,8 @@ if __name__ == "__main__":
     for id_t, t in enumerate(times):
         sattelite_measurement_possition = measurement_sattelite.at(t)
         sattelite_dummy_possition = measured_sattelite.at(t)
-        print(sattelite_dummy_possition)
 
-        sun_position = Sun.get_sun_position(t)
+        #sun_position = Sun.get_sun_position(t)
 
         measured_objects = [measured_sattelite]
         measurement_sattelite.orient_instrument_on_satellite('Camera', sattelite_dummy_possition)

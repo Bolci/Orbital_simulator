@@ -9,10 +9,13 @@ class SatteliteActive(SatteliteDummy):
         super().__init__(label, orientation_vector)
 
         self.sattelite_intruments = {}
+        self.sattelite_instruments_orientation = {}
 
     def add_intruments(self, intrument_label, instrument):
         self.sattelite_intruments[intrument_label] = instrument
 
+    def set_intrument_orientation_relative_to_sattelite(self, intrument_label, orientation_vector):
+        self.sattelite_instruments_orientation[intrument_label] = orientation_vector
 
     def orient_instrument_on_satellite(self, intrument_label, target_point_vector):
         target_vector = target_point_vector - self.get_current_position()
