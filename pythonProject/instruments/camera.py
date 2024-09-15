@@ -1,18 +1,10 @@
+from .dummy_instrument import DummyIntrument
 import numpy as np
-from utils import Utils
 import cv2
+import sys
 
-
-class DummyIntrument():
-    def __init__(self, intrument_label):
-        self.intrument_label = intrument_label
-        self.parent_sattelite = None
-
-    def assign_sattelite(self, sattelite_pointer):
-        self.parent_sattelite = sattelite_pointer
-
-    def measure(self, data_from_objects):
-        pass
+sys.path.append("../")
+from utils import Utils
 
 
 class Camera(DummyIntrument):
@@ -148,10 +140,3 @@ class Camera(DummyIntrument):
                 image = self.get_image(relative_distance_m, measured_object)
 
         return image
-
-class LaserAltimeter(DummyIntrument):
-    def __init__(self):
-        super().__init__(intrument_label="Laser_altimeter")
-
-    def measure(self, data_from_objects):
-        pass

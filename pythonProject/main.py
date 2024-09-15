@@ -6,7 +6,8 @@ from tle_worker import TLEWorker
 from objects import Sphere, Sun
 from sattelites.sattelite_active import SatteliteActive
 from sattelites.sattelite_object import SatteliteObject
-from instruments import Camera, LaserAltimeter
+from instruments.camera import Camera
+from instruments.laser_altimeter import LaserAltimeter
 
 
 if __name__ == "__main__":
