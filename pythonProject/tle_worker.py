@@ -44,14 +44,21 @@ class TLEWorker:
 
   def generate_tle_from_orbit_object(self, orbit):
     # Extract the classical orbital elements
-    semi_major_axis = orbit.a.to(u.km)
-    eccentricity = orbit.ecc
-    inclination = orbit.inc.to(u.deg)
-    raan = orbit.raan.to(u.deg)
-    argp = orbit.argp.to(u.deg)
-    true_anomaly = orbit.nu.to(u.deg)
 
-    [line1, line2] = self.generate_tle()
+
+    altitude = orbit.a.to_value(u.km) - self.r_earth
+    print(altitude)
+    eccentricity = orbit.ecc
+    inclination = orbit.inc.to_value(u.deg)
+    raan = orbit.raan.to_value(u.deg)
+    argp = orbit.argp.to_value(u.deg)
+    #true_anomaly = orbit.nu.to_value(u.deg)
+
+    [line1, line2] = self.generate_tle(altitude=altitude,
+                                       inclination=inclination,
+                                       raan=raan,
+                                       eccentricity=eccentricity)
+    return [line1, line2]
 
   def generate_tle(self,
                    altitude,

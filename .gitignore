@@ -7,3 +7,5 @@ pythonProject/intruments/__pycache__
 pythonProject/sattelites/__pycache__
 .idea
 pythonProject/.idea
+tester_laser.py
+main_tester.py

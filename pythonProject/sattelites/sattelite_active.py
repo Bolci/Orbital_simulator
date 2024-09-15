@@ -13,6 +13,7 @@ class SatteliteActive(SatteliteDummy):
     def add_intruments(self, intrument_label, instrument):
         self.sattelite_intruments[intrument_label] = instrument
 
+
     def orient_instrument_on_satellite(self, intrument_label, target_point_vector):
         target_vector = target_point_vector - self.get_current_position()
         target_vector = Utils.get_unit_vector(target_vector)  # Normalize the vector
