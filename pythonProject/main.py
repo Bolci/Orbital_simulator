@@ -77,8 +77,8 @@ if __name__ == "__main__":
     measurement_sattelite.add_intruments('Camera', camera)
     measurement_sattelite.add_intruments('Laser_atimeter', laser_altimeter)
 
-    measurement_sattelite.set_intrument_orientation_relative_to_sattelite('Camera', np.array([0.5,0.2,1.]))
-
+    measurement_sattelite.set_intrument_orientation_relative_to_sattelite('Camera', np.array([0.,0.,1.0]))
+    measurement_sattelite.set_intrument_orientation_relative_to_sattelite('Laser_atimeter', np.array([0.0, 0.2, 0.0]))
 
     x_vals = []
     y_vals = []

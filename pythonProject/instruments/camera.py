@@ -27,8 +27,6 @@ class Camera(DummyIntrument):
 
         self.focal_length_xy = (self.resolution / 2) / np.tan(self.fov_deg / 2)
 
-        self.relative_orientation_to_sattelite_vec = [0.,0.,0.]
-
         self.camera_matrix = np.array([[self.focal_length_xy[1], 0, self.resolution[1]//2],
                                               [0, self.focal_length_xy[0], self.resolution[0]//2],
                                               [0, 0, 1]], dtype=np.float32)
@@ -38,11 +36,6 @@ class Camera(DummyIntrument):
     def get_camera_matrix(self):
         return self.camera_matrix
 
-    def set_orientation_to_parent_sattelite_vec(self, orientation_vector):
-        self.relative_orientation_to_sattelite_vec = orientation_vector
-
-    def get_orientation_to_parent_sattelite_vec(self):
-        return self.relative_orientation_to_sattelite_vec
 
     @staticmethod
     def calculate_arcseconds_per_pixel(fov_degrees, resolution_pixels):
@@ -69,7 +62,7 @@ class Camera(DummyIntrument):
 
         return apparent_radius_in_pixels_x, apparent_radius_in_pixels_y
 
-    def get_image(self, relative_distance_m, measured_object):
+    def get_image(self, measured_object):
         img = np.zeros(self.resolution, dtype=np.uint8)
 
         position_of_measured_object = measured_object.get_current_position()
@@ -80,9 +73,12 @@ class Camera(DummyIntrument):
         direction_to_sattelite = Utils.get_unit_vector(relative_position)
 
         relative_position = np.dot(self.parent_sattelite.rotation_matrix.T, direction_to_sattelite)
-        relative_position *= distance_to_sattelite
+        relative_position = Utils.get_unit_vector(relative_position)
+        #relative_position *= distance_to_sattelite
 
         rotation_vector = np.zeros((1,3), dtype=np.float32)
+        #rotation_vector = Utils.rotation_matrix_to_vector(self.parent_sattelite.rotation_matrix).as_matrix().T
+
         image_points, _ = cv2.projectPoints(np.asarray([0.,0.,0.]), rotation_vector, relative_position, self.camera_matrix,
                                             self.distortion_coeficients)
         image_points = image_points.astype(np.int32)
@@ -108,9 +104,8 @@ class Camera(DummyIntrument):
             relative_position = self.parent_sattelite.get_current_position() - measured_object.get_current_position()
 
             relative_distance = Utils.norm(relative_position)
-            relative_distance_m = relative_distance * 1000
 
             if relative_distance <= self.max_view_km:
-                image = self.get_image(relative_distance_m, measured_object)
+                image = self.get_image(measured_object)
 
         return image

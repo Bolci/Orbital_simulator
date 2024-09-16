@@ -33,9 +33,7 @@ class SatteliteActive(SatteliteDummy):
             np.dot(d_rotation, self.instrument_orientation_with_respect_to_global[intrument_label])
 
         self.update_rotation_by_r_matric(d_rotation)
-        #self.x_axis = np.dot(d_rotation.T, self.x_axis)
-        #self.y_axis = np.dot(d_rotation.T, self.y_axis)
-        #self.z_axis = np.dot(d_rotation.T, self.z_axis)
+
 
 
 
