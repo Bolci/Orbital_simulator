@@ -1,7 +1,5 @@
 from skyfield.sgp4lib import EarthSatellite
 import numpy as np
-
-from scipy.spatial.transform import Rotation as R
 from copy import copy
 import sys
 
@@ -10,16 +8,19 @@ from utils import Utils
 
 
 class SatteliteDummy:
-    def __init__(self, label, orientation_quaternion = np.array((0.0,0.0,0.0))):
+    def __init__(self, label):
         self.label = label
 
         self.tle_elem = None
         self.satellite_my = None
-        self.orientation_quaternion = orientation_quaternion
 
-        self.x_axis = np.array([1, 0, 0 ], dtype=np.float32)
+        self.x_axis = np.array([1, 0, 0], dtype=np.float32)
         self.y_axis = np.array([0, 1, 0], dtype=np.float32)
         self.z_axis = np.array([0, 0, 1], dtype=np.float32)
+
+        self.rotation_matrix = np.column_stack((self.x_axis,
+                                                self.y_axis,
+                                                self.z_axis))
 
     @property
     def get_x_axis(self):
@@ -34,29 +35,19 @@ class SatteliteDummy:
         return self.z_axis
 
     def update_rotation_by_r_matric(self, R_matrix):
-        self.x_axis = R_matrix.apply(self.x_axis)
-        self.y_axis = R_matrix.apply(self.y_axis)
-        self.z_axis = R_matrix.apply(self.z_axis)
-
-    def update_axis_by_quaternion(self, quaterion):
-        R_matrix = Utils.convert_quaternion_to_rotation_matrix(quaterion)
-        self.x_axis = R_matrix.dot(self.x_axis)
-        self.y_axis = R_matrix.dot(self.y_axis)
-        self.z_axis = R_matrix.dot(self.z_axis)
+        self.x_axis = np.dot(R_matrix, self.x_axis)
+        self.y_axis = np.dot(R_matrix, self.y_axis)
+        self.z_axis = np.dot(R_matrix, self.z_axis)
 
     def get_current_position(self):
         return self.position_vector
 
     def get_sattelite_orientation(self):
-        return self.orientation_quaternion
+        return self.initial_rotation_matrix
 
-    def set_rotation_quaternion(self, orientation_quaternion):
-        self.orientation_quaternion = orientation_quaternion
-        self.update_axis_by_quaternion(orientation_quaternion)
-
-    def set_rotation_by_euler_angles(self, eurel_ypr):
-        r = R.from_euler('zyx', eurel_ypr)
-        self.orientation_quaternion = r.as_quat()
+    def set_sattelite_orientation_by_r_matrix(self, r_matrix):
+        self.rotation_matrix = r_matrix
+        self.update_rotation_by_r_matric(r_matrix)
 
     def load_sattelite(self, tle, ts):
         self.satellite_my = EarthSatellite(*tle, self.label, ts)

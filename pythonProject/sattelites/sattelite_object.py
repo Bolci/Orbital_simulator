@@ -1,11 +1,5 @@
-from utils import Utils
 from .sattelite_with_dimensions import SatteliteWithDimension
-from skyfield.sgp4lib import EarthSatellite
 import numpy as np
-from astropy import units as u
-from poliastro.twobody import Orbit
-from poliastro.bodies import Earth
-from copy import copy
 import sys
 sys.path.append('../')
 

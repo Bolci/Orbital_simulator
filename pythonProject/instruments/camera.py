@@ -11,7 +11,6 @@ class Camera(DummyIntrument):
     def __init__(self,
                  sensor_resolution,
                  fov_deg,
-                 relative_initial_orienetation_to_sattelite=[1,0,0], #vector
                  max_view_km=1000,
                  distortion_coeficients = np.zeros((4,1))):
         super().__init__(intrument_label="Camera")
@@ -28,7 +27,7 @@ class Camera(DummyIntrument):
 
         self.focal_length_xy = (self.resolution / 2) / np.tan(self.fov_deg / 2)
 
-        self.relative_orientation_to_sattelite_vec = relative_initial_orienetation_to_sattelite
+        self.relative_orientation_to_sattelite_vec = [0.,0.,0.]
 
         self.camera_matrix = np.array([[self.focal_length_xy[1], 0, self.resolution[1]//2],
                                               [0, self.focal_length_xy[0], self.resolution[0]//2],
@@ -39,33 +38,17 @@ class Camera(DummyIntrument):
     def get_camera_matrix(self):
         return self.camera_matrix
 
-    def set_rotation(self, rotation):
-        self.relative_orientation_to_sattelite = rotation
+    def set_orientation_to_parent_sattelite_vec(self, orientation_vector):
+        self.relative_orientation_to_sattelite_vec = orientation_vector
+
+    def get_orientation_to_parent_sattelite_vec(self):
+        return self.relative_orientation_to_sattelite_vec
 
     @staticmethod
     def calculate_arcseconds_per_pixel(fov_degrees, resolution_pixels):
         fov_arcseconds = fov_degrees * 3600
         arcsec_per_pixel = fov_arcseconds / resolution_pixels
         return arcsec_per_pixel
-
-    def project_pihole(self, point):
-        """
-        Project a 3D point onto a 2D image plane using a pinhole camera model with rotation.
-        """
-        translated_point = point - self.parent_sattelite.get_current_position()
-        #rotated_point = Utils.compute_rotation_matrix_in_3D(*self.relative_orientation_to_sattelite) @ translated_point
-        rotated_point = translated_point
-        # if rotated_point[2] <= 0:
-        #    return None # Ignore points behind the camera
-
-        x_2d = self.focal_length_xy[0] * (rotated_point[0] / rotated_point[2])
-        y_2d = self.focal_length_xy[1] * (rotated_point[1] / rotated_point[2])
-
-        # Convert to pixel coordinates
-        pixel_x = int((x_2d + self.resolution[0] / 2))
-        pixel_y = int((self.resolution[1] / 2 - y_2d))
-
-        return pixel_x, pixel_y, rotated_point[2]
 
     @staticmethod
     def calculate_apparent_radius(fov_x_rad, fov_y_rad, resolution_x, resolution_y, distance, actual_radius):
@@ -96,22 +79,13 @@ class Camera(DummyIntrument):
         distance_to_sattelite = Utils.norm(relative_position)
         direction_to_sattelite = Utils.get_unit_vector(relative_position)
 
-
-        rotation_matrix = np.column_stack((self.parent_sattelite.x_axis,
-                                           self.parent_sattelite.y_axis,
-                                           self.parent_sattelite.z_axis))
-
-
-        relative_position = np.dot(rotation_matrix.T, relative_position)
-
-        #relative_position = np.asarray([relative_position[0], relative_position[1]+100.0, relative_position[2]])
-
+        relative_position = np.dot(self.parent_sattelite.rotation_matrix.T, direction_to_sattelite)
+        relative_position *= distance_to_sattelite
 
         rotation_vector = np.zeros((1,3), dtype=np.float32)
         image_points, _ = cv2.projectPoints(np.asarray([0.,0.,0.]), rotation_vector, relative_position, self.camera_matrix,
                                             self.distortion_coeficients)
         image_points = image_points.astype(np.int32)
-
 
 
         projected_radius = self.calculate_apparent_radius(self.fov_rad[1],

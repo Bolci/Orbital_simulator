@@ -1,4 +1,6 @@
 import numpy as np
+from scipy.spatial.transform import Rotation as R
+
 
 class Utils:
     @staticmethod
@@ -30,6 +32,60 @@ class Utils:
 
         # Combined rotation matrix
         return Ry @ Rx
+
+    @staticmethod
+    def get_rotation_object(angle_times_axis):
+        return R.from_rotvec(angle_times_axis)
+
+    @staticmethod
+    def rotation_matrix_to_vector(rotation_matrix):
+        return R.from_matrix(rotation_matrix)
+
+    @staticmethod
+    def get_perpendicual_vector_to_vectors(vec1, vec2):
+        return np.cross(vec1, vec2)
+
+    @staticmethod
+    def get_rotation_angle(vec_1, vec_2):
+        theta = np.dot(vec_1, vec_2)
+
+        if np.isclose(theta, 0, atol=1e-8):  # Set atol to desired toleranc
+            theta = 0
+        theta = np.arccos(np.clip(theta, -1.0, 1.0))
+
+        return theta
+
+    @staticmethod
+    def compute_rotation_matrix(P1, P2, fixed_vector, current_rotation):
+        direction = P2 - P1
+        direction = Utils.get_unit_vector(direction)
+        fixed_vector = Utils.get_unit_vector(fixed_vector)
+
+        direction = np.dot(current_rotation.T, direction)
+
+        rotation_axis = Utils.get_perpendicual_vector_to_vectors(fixed_vector, direction)
+
+        # If the vectors are parallel, no rotation is needed
+        if Utils.norm(rotation_axis) == 0:
+            return R.from_matrix(np.eye(3))
+
+        rotation_axis = Utils.get_unit_vector(rotation_axis)
+        theta = Utils.get_rotation_angle(fixed_vector, direction)
+
+        rotation = R.from_rotvec(theta * rotation_axis)
+
+        return rotation
+
+    @staticmethod
+    def update_orientation(P1, P2, fixed_vector, current_rotation=None):
+        if current_rotation is None:
+            current_rotation = R.identity()  # Initialize with identity if no previous rotation
+
+        rotation = Utils.compute_rotation_matrix(P1, P2, fixed_vector, current_rotation)
+        rotation = rotation.as_matrix()
+        current_rotation = current_rotation @ rotation
+
+        return current_rotation, rotation
 
     @staticmethod
     def yaw_pitch_roll_to_vector(yaw, pitch, roll, length):

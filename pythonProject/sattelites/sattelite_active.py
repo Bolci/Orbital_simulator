@@ -1,26 +1,45 @@
-from skyfield.sgp4lib import EarthSatellite
 import numpy as np
 from utils import Utils
 from .sattelite_dummy import SatteliteDummy
 
 
 class SatteliteActive(SatteliteDummy):
-    def __init__(self, label, orientation_vector = np.array((0.0,0.0,0.0, 1.0))):
-        super().__init__(label, orientation_vector)
+    def __init__(self, label):
+        super().__init__(label)
 
         self.sattelite_intruments = {}
-        self.sattelite_instruments_orientation = {}
+        self.instrument_orientation_with_respect_to_global = {}
+
 
     def add_intruments(self, intrument_label, instrument):
         self.sattelite_intruments[intrument_label] = instrument
 
     def set_intrument_orientation_relative_to_sattelite(self, intrument_label, orientation_vector):
-        self.sattelite_instruments_orientation[intrument_label] = orientation_vector
+        self.sattelite_intruments[intrument_label].set_orientation_to_parent_sattelite_vec(orientation_vector)
+        self.instrument_orientation_with_respect_to_global[intrument_label] = np.dot(self.rotation_matrix, orientation_vector)
 
     def orient_instrument_on_satellite(self, intrument_label, target_point_vector):
-        target_vector = target_point_vector - self.get_current_position()
-        target_vector = Utils.get_unit_vector(target_vector)  # Normalize the vector
+        sattelite_location = self.get_current_position()
+        intrument_local_orienation = self.sattelite_intruments[intrument_label].relative_orientation_to_sattelite_vec
 
+        current_rotation, d_rotation = Utils.update_orientation(sattelite_location,
+                                                                target_point_vector,
+                                                                intrument_local_orienation,
+                                                                self.rotation_matrix)
+
+        self.rotation_matrix = current_rotation
+
+        self.instrument_orientation_with_respect_to_global[intrument_label] = \
+            np.dot(d_rotation, self.instrument_orientation_with_respect_to_global[intrument_label])
+
+        self.update_rotation_by_r_matric(d_rotation)
+        #self.x_axis = np.dot(d_rotation.T, self.x_axis)
+        #self.y_axis = np.dot(d_rotation.T, self.y_axis)
+        #self.z_axis = np.dot(d_rotation.T, self.z_axis)
+
+
+
+        '''
         new_z_axis = target_vector
 
         new_y_axis = np.array([0, 0, 1]).astype(np.float64) # Start with the global z-axis
@@ -32,24 +51,11 @@ class SatteliteActive(SatteliteDummy):
 
         new_y_axis = np.cross(new_z_axis, new_x_axis)
         new_y_axis /= np.linalg.norm(new_y_axis)
+        '''
 
-        self.x_axis = new_x_axis
-        self.y_axis = new_y_axis
-        self.z_axis = new_z_axis
-
-        #measured_intrument = self.sattelite_intruments[intrument_label]
-        #intrument_unic_vec = Utils.get_unit_vector(measured_intrument.relative_orientation_to_sattelite_vec)
-
-        #rotation_axis = np.cross(target_vector, intrument_unic_vec)
-        #rotation_axis = Utils.get_unit_vector(rotation_axis)
-        #rotation_angle = np.arccos(np.dot(intrument_unic_vec, target_vector))
-
-        #rotation_quaternion = QuaternionMath.create_quaternion(rotation_axis, rotation_angle)
-        #new_rotation = QuaternionMath.rotate_vector_by_quaternion(self.orientation_vector, rotation_quaternion)
-
-        #self.orientation_quaternion = rotation_quaternion
-        #self.update_axis_by_quaternion(rotation_quaternion)
-
+        #self.x_axis = new_x_axis
+        #self.y_axis = new_y_axis
+        #self.z_axis = new_z_axis
 
     def at(self, t):
         if self.satellite_my is None:

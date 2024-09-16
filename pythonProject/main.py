@@ -66,12 +66,6 @@ if __name__ == "__main__":
     measurement_sattelite = SatteliteActive('Measurement_sattelite')
     measurement_sattelite.load_sattelite(tle_measurement_sat, ts)
 
-    # generate instruments
-    #camera_orientation = [1,0,0] #pointign vec
-    #isntrument_sattelite_initial_orientation = [0,0,0] #yaw, pitch, roll
-    #r = R.from_euler('zyx', isntrument_sattelite_initial_orientation)
-    #init_sattelite_quaternion = r.as_quat()
-    #measurement_sattelite.set_rotation_quaternion(init_sattelite_quaternion)
 
     camera = Camera(sensor_resolution=sensor_resolution,
                     fov_deg=fov_deg)
@@ -83,7 +77,7 @@ if __name__ == "__main__":
     measurement_sattelite.add_intruments('Camera', camera)
     measurement_sattelite.add_intruments('Laser_atimeter', laser_altimeter)
 
-    measurement_sattelite.set_intrument_orientation_relative_to_sattelite('Camera', np.array([0.,0.,1.]))
+    measurement_sattelite.set_intrument_orientation_relative_to_sattelite('Camera', np.array([0.5,0.2,1.]))
 
 
     x_vals = []

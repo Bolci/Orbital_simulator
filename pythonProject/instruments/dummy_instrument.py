@@ -1,6 +1,3 @@
-import numpy as np
-from utils import Utils
-import cv2
 
 
 class DummyIntrument:
