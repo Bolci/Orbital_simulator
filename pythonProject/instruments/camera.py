@@ -74,11 +74,9 @@ class Camera(DummyIntrument):
 
         relative_position = np.dot(self.parent_sattelite.rotation_matrix.T, direction_to_sattelite)
         relative_position = Utils.get_unit_vector(relative_position)
-        #relative_position *= distance_to_sattelite
+        relative_position *= distance_to_sattelite
 
         rotation_vector = np.zeros((1,3), dtype=np.float32)
-        #rotation_vector = Utils.rotation_matrix_to_vector(self.parent_sattelite.rotation_matrix).as_matrix().T
-
         image_points, _ = cv2.projectPoints(np.asarray([0.,0.,0.]), rotation_vector, relative_position, self.camera_matrix,
                                             self.distortion_coeficients)
         image_points = image_points.astype(np.int32)
