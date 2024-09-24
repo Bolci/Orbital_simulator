@@ -83,7 +83,7 @@ class Utils:
 
         rotation = Utils.compute_rotation_matrix(P1, P2, fixed_vector, current_rotation)
         rotation = rotation.as_matrix()
-        current_rotation = current_rotation @ rotation
+        current_rotation =  current_rotation @ rotation
 
         return current_rotation, rotation
 

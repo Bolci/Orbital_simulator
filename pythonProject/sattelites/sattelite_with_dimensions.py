@@ -11,6 +11,7 @@ class SatteliteWithDimension(SatteliteDummy):
         self.radius = radius
         self.satt_object = Sphere.get_planet(radius)
 
+    @property
     def get_radius(self):
         return self.radius
 

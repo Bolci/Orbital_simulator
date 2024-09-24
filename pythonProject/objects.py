@@ -5,7 +5,7 @@ from skyfield.api import load
 class Sphere:
 
     @staticmethod
-    def get_planet(planet_radius):
+    def get_planet(planet_radius: float) -> tuple:
         u = np.linspace(0, 2 * np.pi, 100)
         v = np.linspace(0, np.pi, 100)
 
@@ -16,7 +16,10 @@ class Sphere:
         return x_planet, y_planet, z_planet
 
     @staticmethod
-    def get_sphere_with_in_diff_coordinates(planet_radius, x, y, z):
+    def get_sphere_with_in_diff_coordinates(planet_radius: float,
+                                            x: float,
+                                            y: float,
+                                            z: float) -> tuple[float, float, float]:
         x_p, y_p, z_p = Sphere.get_planet(planet_radius)
         x_p += x
         y_p += y
@@ -29,9 +32,10 @@ class Sun:
     def __init__(self):
         self.sun = load('de421.bsp')['sun']
 
-    def get_sun_position(self, t):
+    def get_sun_position(self, t: float) -> float:
         return self.sun.at(t).position.km
 
-    def get_relative_position_to_sun(self, t, sattelite_position):
+    def get_relative_position_to_sun(self, t: float, sattelite_position):
+        print(type(t))
         sun_position = self.get_sun_position(t)
         return sun_position - sattelite_position

@@ -1,5 +1,7 @@
 from .dummy_instrument import DummyIntrument
 import numpy as np
+from numpy.typing import NDArray
+from typing import Tuple
 import cv2
 import sys
 
@@ -9,12 +11,11 @@ from utils import Utils
 
 class Camera(DummyIntrument):
     def __init__(self,
-                 sensor_resolution,
-                 fov_deg,
-                 max_view_km=1000,
-                 distortion_coeficients = np.zeros((4,1))):
+                 sensor_resolution: tuple,
+                 fov_deg: tuple,
+                 max_view_km: float =1000.0,
+                 distortion_coeficients: tuple = (0.0,0.0,0.0,0.0)) -> None:
         super().__init__(intrument_label="Camera")
-
 
         self.arcsec_to_rad = 4.84814e-6  # s
         self.resolution = np.asarray(sensor_resolution)
@@ -30,21 +31,27 @@ class Camera(DummyIntrument):
         self.camera_matrix = np.array([[self.focal_length_xy[1], 0, self.resolution[1]//2],
                                               [0, self.focal_length_xy[0], self.resolution[0]//2],
                                               [0, 0, 1]], dtype=np.float32)
-        self.distortion_coeficients = distortion_coeficients
+        self.distortion_coeficients = np.asarray(distortion_coeficients)
 
     @property
-    def get_camera_matrix(self):
+    def get_camera_matrix(self) -> NDArray[np.float64]:
         return self.camera_matrix
 
 
     @staticmethod
-    def calculate_arcseconds_per_pixel(fov_degrees, resolution_pixels):
+    def calculate_arcseconds_per_pixel(fov_degrees: NDArray[np.float32],
+                                       resolution_pixels: NDArray[np.float32]) -> NDArray[np.float32]:
         fov_arcseconds = fov_degrees * 3600
         arcsec_per_pixel = fov_arcseconds / resolution_pixels
         return arcsec_per_pixel
 
     @staticmethod
-    def calculate_apparent_radius(fov_x_rad, fov_y_rad, resolution_x, resolution_y, distance, actual_radius):
+    def calculate_apparent_radius(fov_x_rad: float,
+                                  fov_y_rad: float,
+                                  resolution_x: float,
+                                  resolution_y: float,
+                                  distance: float,
+                                  actual_radius: float) -> Tuple[int, int]:
         # Calculate the visible size at the given distance (using half of the FOV for calculation)
         visible_size_x = 2 * (distance * np.tan(fov_x_rad / 2))
         visible_size_y = 2 * (distance * np.tan(fov_y_rad / 2))
@@ -65,10 +72,10 @@ class Camera(DummyIntrument):
     def get_image(self, measured_object):
         img = np.zeros(self.resolution, dtype=np.uint8)
 
-        position_of_measured_object = measured_object.get_current_position()
-        radius_of_measured_object = measured_object.get_radius()
+        position_of_measured_object = measured_object.get_current_position
+        radius_of_measured_object = measured_object.get_radius
 
-        relative_position = position_of_measured_object - self.parent_sattelite.get_current_position()
+        relative_position = position_of_measured_object - self.parent_sattelite.get_current_position
         distance_to_sattelite = Utils.norm(relative_position)
         direction_to_sattelite = Utils.get_unit_vector(relative_position)
 
@@ -99,7 +106,7 @@ class Camera(DummyIntrument):
         image = np.zeros(self.resolution, dtype=np.uint8)
 
         for measured_object in measured_objects:
-            relative_position = self.parent_sattelite.get_current_position() - measured_object.get_current_position()
+            relative_position = self.parent_sattelite.get_current_position - measured_object.get_current_position
 
             relative_distance = Utils.norm(relative_position)
 

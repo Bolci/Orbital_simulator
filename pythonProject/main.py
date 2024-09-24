@@ -115,9 +115,9 @@ if __name__ == "__main__":
         y_vals2.append(sattelite_dummy_possition[1])
         z_vals2.append(sattelite_dummy_possition[2])
 
-        active_orientation_axis_x.append(measurement_sattelite.get_x_axis)
-        active_orientation_axis_y.append(measurement_sattelite.get_y_axis)
-        active_orientation_axis_z.append(measurement_sattelite.get_z_axis)
+        active_orientation_axis_x.append(measurement_sattelite.x_axis)
+        active_orientation_axis_y.append(measurement_sattelite.y_axis)
+        active_orientation_axis_z.append(measurement_sattelite.z_axis)
 
         image_all += measured_data['Camera']
 

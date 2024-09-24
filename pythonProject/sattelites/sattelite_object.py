@@ -1,18 +1,20 @@
 from .sattelite_with_dimensions import SatteliteWithDimension
 import numpy as np
 import sys
+from skyfield.timelib import Time
+from numpy.typing import NDArray
 sys.path.append('../')
 
 from tle_worker import TLEWorker
 
 class SatteliteObject(SatteliteWithDimension):
     def __init__(self,
-                 label,
-                 position_degradation_speed_km=0.2,
-                 drift_speed_km_per_sec=0.01,
-                 initial_uncertainty_km=1.0,
-                 initial_velocity_uncertenaity_kms = 0.001,
-                 radius = 0.05):
+                 label: str,
+                 position_degradation_speed_km:float = 0.2,
+                 drift_speed_km_per_sec:float = 0.01,
+                 initial_uncertainty_km:float = 1.0,
+                 initial_velocity_uncertenaity_kms:float = 0.001,
+                 radius:float = 0.05) -> None:
         super().__init__(label, radius)
 
         self.initial_velocity_uncertenaity_kms = initial_velocity_uncertenaity_kms
@@ -25,7 +27,7 @@ class SatteliteObject(SatteliteWithDimension):
         self.satellite_my_true = None
 
     @staticmethod
-    def sample_from_uncertainity(parameter):
+    def sample_from_uncertainity(parameter) -> NDArray:
         return np.random.uniform(-1, 1, size=3) * parameter
 
     def load_sattelite(self, tle, ts):
@@ -61,15 +63,15 @@ class SatteliteObject(SatteliteWithDimension):
         #self.tle_true = generated_tle
         #self.satellite_my_true = EarthSatellite(*generated_tle, "_true", ts)
 
-
+    @property
     def get_tle_epoch(self):
         return self.satellite_my.epoch
 
-    def dt_time(self, t):
+    def dt_time(self, t: Time):
         return (t.tt - self.get_tle_epoch().tt)
 
 
-    def at(self, t):
+    def at(self, t: Time):
         if self.satellite_my is None:
             raise Exception("Satellite data not loaded")
 
@@ -82,9 +84,3 @@ class SatteliteObject(SatteliteWithDimension):
         #geocentric = self.satellite_my_true.at(new_t)
         #exact_position = geocentric.position.km
         return expected_position
-        '''
-        return {
-            'exact_position': exact_position,
-            'uncertain_position': expected_position,
-        }
-        '''

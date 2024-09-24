@@ -1,6 +1,17 @@
+from abc import ABC, abstractmethod
 
 
-class DummyIntrument:
+class SatteliteAbstract(ABC):
+    @abstractmethod
+    def __init__(self, *args, **kwargs):
+        pass
+
+    @abstractmethod
+    def measure(self, data_from_objects):
+        pass
+
+
+class DummyIntrument(SatteliteAbstract):
     def __init__(self, intrument_label):
         self.intrument_label = intrument_label
         self.parent_sattelite = None
@@ -9,6 +20,7 @@ class DummyIntrument:
 
     def assign_sattelite(self, sattelite_pointer):
         self.parent_sattelite = sattelite_pointer
+
 
     def measure(self, data_from_objects):
         pass

@@ -71,8 +71,7 @@ ax.plot([0],[0],[0],'*', label="GCC")
 for step in range(2):  # Simulating over 10 time steps
     P1 = P1_all[step]
     P2 = P2_all[step]
-    #P1 = np.array([1,2,3])
-    #P2 = np.array([4,5,6])
+
     current_rotation, rotation = update_orientation(P1, P2, fixed_vector, current_rotation)
     #rot_matrix = current_rotation.as_matrix()
     rot_matrix = current_rotation

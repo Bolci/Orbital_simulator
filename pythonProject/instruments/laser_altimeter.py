@@ -42,7 +42,7 @@ class LaserAltimeter(DummyIntrument):
 
             return_signal = [0, None]
 
-            relative_position = self.parent_sattelite.get_current_position() - measured_object.get_current_position()
+            relative_position = self.parent_sattelite.get_current_position - measured_object.get_current_position
             relative_distance = Utils.norm(relative_position)
             target_distance = relative_distance * 1000 #distance in meters
             beam_radius = target_distance*self.beam_divergence
