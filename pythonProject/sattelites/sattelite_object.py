@@ -1,7 +1,7 @@
 from .sattelite_with_dimensions import SatteliteWithDimension
 import numpy as np
 import sys
-from skyfield.timelib import Time
+from skyfield.timelib import Time, Timescale
 from numpy.typing import NDArray
 sys.path.append('../')
 
@@ -30,7 +30,7 @@ class SatteliteObject(SatteliteWithDimension):
     def sample_from_uncertainity(parameter) -> NDArray:
         return np.random.uniform(-1, 1, size=3) * parameter
 
-    def load_sattelite(self, tle: list[str], ts: Time) -> None:
+    def load_sattelite(self, tle: list[str], ts: Timescale) -> None:
         super().load_sattelite(tle, ts)
         #ts_now = ts.now()
         #sattelite_my_now = self.satellite_my.at(ts_now)
