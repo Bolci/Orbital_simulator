@@ -13,7 +13,6 @@ class SatteliteActive(SatteliteDummy):
         self.sattelite_intruments = {}
         self.instrument_orientation_with_respect_to_global = {}
 
-
     def add_intruments(self, intrument_label: str, instrument: Optional) -> None:
         self.sattelite_intruments[intrument_label] = instrument
 
@@ -39,7 +38,6 @@ class SatteliteActive(SatteliteDummy):
             np.dot(d_rotation, self.instrument_orientation_with_respect_to_global[intrument_label])
 
         self.update_rotation_by_r_matric(d_rotation)
-
 
     def at(self, t: Time) -> NDArray:
         if self.satellite_my is None:

@@ -23,7 +23,7 @@ class SatteliteAbstract(ABC):
 
 
 class SatteliteDummy(SatteliteAbstract):
-    def __init__(self, label):
+    def __init__(self, label) -> None:
         self.label = label
 
         self.tle_elem = None

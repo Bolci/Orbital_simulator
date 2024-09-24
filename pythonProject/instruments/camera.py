@@ -1,7 +1,7 @@
 from .dummy_instrument import DummyIntrument
 import numpy as np
 from numpy.typing import NDArray
-from typing import Tuple
+from typing import Tuple, Optional
 import cv2
 import sys
 
@@ -69,7 +69,7 @@ class Camera(DummyIntrument):
 
         return apparent_radius_in_pixels_x, apparent_radius_in_pixels_y
 
-    def get_image(self, measured_object):
+    def get_image(self, measured_object: Optional) -> NDArray:
         img = np.zeros(self.resolution, dtype=np.uint8)
 
         position_of_measured_object = measured_object.get_current_position
@@ -102,7 +102,7 @@ class Camera(DummyIntrument):
 
         return img
 
-    def measure(self, measured_objects):
+    def measure(self, measured_objects: Optional) -> NDArray:
         image = np.zeros(self.resolution, dtype=np.uint8)
 
         for measured_object in measured_objects:

@@ -30,7 +30,7 @@ class SatteliteObject(SatteliteWithDimension):
     def sample_from_uncertainity(parameter) -> NDArray:
         return np.random.uniform(-1, 1, size=3) * parameter
 
-    def load_sattelite(self, tle, ts):
+    def load_sattelite(self, tle: list[str, str], ts: Time) -> None:
         super().load_sattelite(tle, ts)
         #ts_now = ts.now()
         #sattelite_my_now = self.satellite_my.at(ts_now)
@@ -71,7 +71,7 @@ class SatteliteObject(SatteliteWithDimension):
         return (t.tt - self.get_tle_epoch().tt)
 
 
-    def at(self, t: Time):
+    def at(self, t: Time) -> NDArray:
         if self.satellite_my is None:
             raise Exception("Satellite data not loaded")
 
