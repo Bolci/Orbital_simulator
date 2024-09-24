@@ -1,14 +1,15 @@
 import numpy as np
 from scipy.spatial.transform import Rotation as R
+from numpy.typing import NDArray
 
 
 class Utils:
     @staticmethod
-    def norm(vec):
+    def norm(vec: NDArray) -> NDArray:
         return np.sqrt(np.dot(vec, vec))
 
     @staticmethod
-    def compute_rotation_matrix_in_3D(pitch, yaw, roll):
+    def compute_rotation_matrix_in_3D(pitch: float, yaw: float, roll: float) -> NDArray:
         # Rotation matrix around X-axis (pitch)
         Rx = np.array([
             [1, 0, 0],
@@ -31,22 +32,22 @@ class Utils:
         ])
 
         # Combined rotation matrix
-        return Ry @ Rx
+        return Rz @ Ry @ Rx
 
     @staticmethod
-    def get_rotation_object(angle_times_axis):
+    def get_rotation_object(angle_times_axis: NDArray) -> R:
         return R.from_rotvec(angle_times_axis)
 
     @staticmethod
-    def rotation_matrix_to_vector(rotation_matrix):
+    def rotation_matrix_to_vector(rotation_matrix: NDArray) -> R:
         return R.from_matrix(rotation_matrix)
 
     @staticmethod
-    def get_perpendicual_vector_to_vectors(vec1, vec2):
+    def get_perpendicual_vector_to_vectors(vec1: NDArray, vec2: NDArray) -> NDArray:
         return np.cross(vec1, vec2)
 
     @staticmethod
-    def get_rotation_angle(vec_1, vec_2):
+    def get_rotation_angle(vec_1: NDArray, vec_2: NDArray) -> float:
         theta = np.dot(vec_1, vec_2)
 
         if np.isclose(theta, 0, atol=1e-8):  # Set atol to desired toleranc
@@ -56,8 +57,11 @@ class Utils:
         return theta
 
     @staticmethod
-    def compute_rotation_matrix(P1, P2, fixed_vector, current_rotation):
-        direction = P2 - P1
+    def compute_rotation_matrix(p1: NDArray,
+                                p2: NDArray,
+                                fixed_vector: NDArray,
+                                current_rotation: R):
+        direction = p2 - p1
         direction = Utils.get_unit_vector(direction)
         fixed_vector = Utils.get_unit_vector(fixed_vector)
 
@@ -88,7 +92,10 @@ class Utils:
         return current_rotation, rotation
 
     @staticmethod
-    def yaw_pitch_roll_to_vector(yaw, pitch, roll, length):
+    def yaw_pitch_roll_to_vector(yaw: float,
+                                 pitch: float,
+                                 roll: float,
+                                 length: float) -> NDArray:
         # Convert angles from degrees to radians
         yaw = np.radians(yaw)
         pitch = np.radians(pitch)
@@ -111,5 +118,5 @@ class Utils:
         return R
 
     @staticmethod
-    def get_unit_vector(vector):
+    def get_unit_vector(vector: NDArray) -> NDArray:
         return vector / np.linalg.norm(vector)

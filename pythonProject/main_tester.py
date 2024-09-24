@@ -1,6 +1,7 @@
 import numpy as np
 from scipy.spatial.transform import Rotation as R
 import matplotlib.pyplot as plt
+from numpy.typing import NDArray
 
 def normalize(v):
     return v / np.linalg.norm(v)

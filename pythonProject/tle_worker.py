@@ -8,7 +8,7 @@ from poliastro.bodies import Earth
 
 class TLEWorker:
   def __init__(self, mu_earth = 398600.4418,
-               r_earth = 6378.1363):
+               r_earth = 6378.1363) -> None:
     self.mu_earth = mu_earth
     self.r_earth = r_earth
 
@@ -21,7 +21,7 @@ class TLEWorker:
     return 86400 / orbital_period
 
   @staticmethod
-  def get_epoch(fraction_of_day = 0.0):
+  def get_epoch(fraction_of_day: float = 0.0):
     now = datetime.utcnow()
 
     #move in time
@@ -42,10 +42,7 @@ class TLEWorker:
     return satellite_iss
 
 
-  def generate_tle_from_orbit_object(self, orbit):
-    # Extract the classical orbital elements
-
-
+  def generate_tle_from_orbit_object(self, orbit: Orbit) -> list[str, str]:
     altitude = orbit.a.to_value(u.km) - self.r_earth
     #print(altitude)
     eccentricity = orbit.ecc
@@ -61,19 +58,19 @@ class TLEWorker:
     return [line1, line2]
 
   def generate_tle(self,
-                   altitude,
-                   inclination,
-                   raan,
-                   eccentricity = 0,
-                   mean_motion_derivative = 0.0,
-                   mean_motion_sec_derivative = 0.0,
-                   bstar = 0.0,
-                   omega = 0.0,
-                   nu = 0.0,
-                   satellite_number = 99999,
-                   element_set_number = 999,
-                   classification = 'U',
-                   international_designator = '2022-999A'):
+                   altitude: float,
+                   inclination: float,
+                   raan: float,
+                   eccentricity: float = 0.0,
+                   mean_motion_derivative: float = 0.0,
+                   mean_motion_sec_derivative: float = 0.0,
+                   bstar: float = 0.0,
+                   omega:float = 0.0,
+                   nu:float = 0.0,
+                   satellite_number:float = 99999,
+                   element_set_number:float = 999,
+                   classification: str = 'U',
+                   international_designator: str = '2022-999A') -> list[str]:
 
     semi_major_axis = self.r_earth + altitude
 
