@@ -30,7 +30,7 @@ class SatteliteObject(SatteliteWithDimension):
     def sample_from_uncertainity(parameter) -> NDArray:
         return np.random.uniform(-1, 1, size=3) * parameter
 
-    def load_sattelite(self, tle: list[str, str], ts: Time) -> None:
+    def load_sattelite(self, tle: list[str], ts: Time) -> None:
         super().load_sattelite(tle, ts)
         #ts_now = ts.now()
         #sattelite_my_now = self.satellite_my.at(ts_now)

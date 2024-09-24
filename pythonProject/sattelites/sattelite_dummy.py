@@ -79,11 +79,11 @@ class SatteliteDummy(SatteliteAbstract):
         self.rotation_matrix = r_matrix
         self.update_rotation_by_r_matric(r_matrix)
 
-    def load_sattelite(self, tle: list[str, str], ts: Timescale) -> None:
+    def load_sattelite(self, tle: list[str], ts: Timescale) -> None:
         self.satellite_my = EarthSatellite(*tle, self.label, ts)
         self.load_tle(tle)
 
-    def load_tle(self, tle: list[str, str]):
+    def load_tle(self, tle: list[str]):
         self.tle_elem = tle
 
     def at(self, t: Time) -> tuple[Geocentric, NDArray]:
