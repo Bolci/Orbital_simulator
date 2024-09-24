@@ -46,28 +46,16 @@ class Camera(DummyIntrument):
         return arcsec_per_pixel
 
     @staticmethod
-    def calculate_apparent_radius(fov_x_rad: float,
-                                  fov_y_rad: float,
-                                  resolution_x: float,
-                                  resolution_y: float,
+    def calculate_apparent_radius(fov_rad: NDArray,
+                                  resolution_x: NDArray,
                                   distance: float,
-                                  actual_radius: float) -> Tuple[int, int]:
-        # Calculate the visible size at the given distance (using half of the FOV for calculation)
-        visible_size_x = 2 * (distance * np.tan(fov_x_rad / 2))
-        visible_size_y = 2 * (distance * np.tan(fov_y_rad / 2))
+                                  actual_radius: float) -> int:
+        visible_size = 2 * (distance * np.tan(fov_rad / 2)) # Calculate the visible size at the given distance (using half of the FOV for calculation)
+        apparent_radius = actual_radius * distance / np.sqrt(distance ** 2 + actual_radius ** 2) # Calculate the apparent radius using geometric projection
+        pixels_per_unit = resolution_x / visible_size # Calculate pixels per unit (for x-axis)
+        apparent_radius_in_pixels = apparent_radius * pixels_per_unit # Calculate the apparent radius in pixels
 
-        # Calculate the apparent radius using geometric projection
-        apparent_radius = actual_radius * distance / np.sqrt(distance ** 2 + actual_radius ** 2)
-
-        # Calculate pixels per unit (for x-axis)
-        pixels_per_unit_x = resolution_x / visible_size_x
-        pixels_per_unit_y = resolution_y / visible_size_y
-
-        # Calculate the apparent radius in pixels
-        apparent_radius_in_pixels_x = apparent_radius * pixels_per_unit_x
-        apparent_radius_in_pixels_y = apparent_radius * pixels_per_unit_y
-
-        return apparent_radius_in_pixels_x, apparent_radius_in_pixels_y
+        return apparent_radius_in_pixels
 
     def get_image(self, measured_object: Optional) -> NDArray:
         img = np.zeros(self.resolution, dtype=np.uint8)
@@ -89,10 +77,8 @@ class Camera(DummyIntrument):
         image_points = image_points.astype(np.int32)
 
 
-        projected_radius = self.calculate_apparent_radius(self.fov_rad[1],
-                                                          self.fov_rad[0],
-                                                          self.resolution[1],
-                                                          self.resolution[0],
+        projected_radius = self.calculate_apparent_radius(self.fov_rad[::-1],
+                                                          self.resolution[::-1],
                                                           distance=distance_to_sattelite,
                                                           actual_radius=radius_of_measured_object)
         projected_radius = projected_radius[0].astype(np.int32)
