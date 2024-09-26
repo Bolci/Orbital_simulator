@@ -81,6 +81,29 @@ class Utils:
         return rotation
 
     @staticmethod
+    def compute_rot_between_vec(vec1, vec2):
+
+        vec1 = Utils.get_unit_vector(vec1)
+        vec2 = Utils.get_unit_vector(vec2)
+
+
+
+        rotation_axis = Utils.get_perpendicual_vector_to_vectors(vec1, vec2)
+
+        if Utils.norm(rotation_axis) == 0:
+            return R.from_matrix(np.eye(3)).as_matrix()
+
+        rotation_axis = Utils.get_unit_vector(rotation_axis)
+        theta = Utils.get_rotation_angle(vec1, vec2)
+
+        rotation = R.from_rotvec(theta * rotation_axis)
+        rotation = rotation.as_matrix()
+        rotation = Utils.get_unit_vector(rotation)
+
+        return rotation
+
+
+    @staticmethod
     def update_orientation(P1, P2, fixed_vector, current_rotation=None):
         if current_rotation is None:
             current_rotation = R.identity()  # Initialize with identity if no previous rotation

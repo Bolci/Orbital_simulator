@@ -43,7 +43,7 @@ class SatteliteActive(SatteliteDummy):
         if self.satellite_my is None:
             raise Exception("Satellite data not loaded")
 
-        [geocentric, exact_position] = super().at(t)
+        [_, exact_position] = super().at(t)
 
         return exact_position
 
