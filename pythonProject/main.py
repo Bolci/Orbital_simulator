@@ -83,9 +83,6 @@ if __name__ == "__main__":
     measurement_sattelite.set_intrument_orientation_relative_to_sattelite('Camera', np.array([0.,0.0, 1.0]))
     measurement_sattelite.set_intrument_orientation_relative_to_sattelite('Laser_atimeter', np.array([0.0, 0.0, 1.0]))
 
-    active_orientation_axis_x = []
-    active_orientation_axis_y = []
-    active_orientation_axis_z = []
 
     counter = 0
     is_oriented_flag = 0
@@ -105,10 +102,6 @@ if __name__ == "__main__":
         is_oriented_flag += 1
 
         measured_data = measurement_sattelite.perform_measurements(measured_objects)
-
-        active_orientation_axis_x.append(measurement_sattelite.x_axis)
-        active_orientation_axis_y.append(measurement_sattelite.y_axis)
-        active_orientation_axis_z.append(measurement_sattelite.z_axis)
 
         image_all += measured_data['Camera']
 
@@ -143,13 +136,16 @@ if __name__ == "__main__":
         if id_x % 10 == 0:
 
             sattelite_possition = measurement_sattelite.sattelite_orbit.get_sample_by_id(id_x)
-            ax.quiver(*sattelite_possition, *active_orientation_axis_x[id_x], length=1000,
+            sattelite_arientation_buffer = measurement_sattelite.orientation_buffer.get_sample_by_id(id_x)
+            print(sattelite_arientation_buffer)
+
+            ax.quiver(*sattelite_possition, *(sattelite_arientation_buffer[0]), length=1000,
                       color='r', normalize=True)
 
-            ax.quiver(*sattelite_possition, *active_orientation_axis_y[id_x], length=1000,
+            ax.quiver(*sattelite_possition, *(sattelite_arientation_buffer[1]), length=1000,
                       color='b', normalize=True)
 
-            ax.quiver(*sattelite_possition, *active_orientation_axis_z[id_x], length=1000,
+            ax.quiver(*sattelite_possition, *(sattelite_arientation_buffer[2]), length=1000,
                       color='g', normalize=True)
 
 

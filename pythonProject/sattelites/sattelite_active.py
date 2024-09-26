@@ -4,6 +4,12 @@ from .sattelite_dummy import SatteliteDummy
 from skyfield.timelib import Time
 from typing import Optional
 from numpy.typing import NDArray
+from copy import copy
+
+import sys
+sys.path.append("../")
+
+from time_buffer import TimeBuffer
 
 
 class SatteliteActive(SatteliteDummy):
@@ -12,9 +18,14 @@ class SatteliteActive(SatteliteDummy):
 
         self.sattelite_intruments = {}
         self.instrument_orientation_with_respect_to_global = {}
+        self._orientation_buffer = TimeBuffer()
 
     def add_intruments(self, intrument_label: str, instrument: Optional) -> None:
         self.sattelite_intruments[intrument_label] = instrument
+
+    @property
+    def orientation_buffer(self):
+        return self._orientation_buffer
 
     def set_intrument_orientation_relative_to_sattelite(self,
                                                         intrument_label: str,
@@ -44,6 +55,8 @@ class SatteliteActive(SatteliteDummy):
             raise Exception("Satellite data not loaded")
 
         [_, exact_position] = super().at(t)
+
+        self._orientation_buffer.add_point(self.x_axis, self.y_axis, self.z_axis, copy(t))
 
         return exact_position
 
