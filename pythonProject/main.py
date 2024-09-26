@@ -81,15 +81,12 @@ if __name__ == "__main__":
     measurement_sattelite.add_intruments('Laser_atimeter', laser_altimeter)
 
     measurement_sattelite.set_intrument_orientation_relative_to_sattelite('Camera', np.array([0.,0.0, 1.0]))
-    measurement_sattelite.set_intrument_orientation_relative_to_sattelite('Laser_atimeter', np.array([0.0, 0.0, 1.0]))
-
+    measurement_sattelite.set_intrument_orientation_relative_to_sattelite('Laser_atimeter', np.array([0.0, 0.0, 1.0])) #TODO: does not have effect for the measurement
 
     counter = 0
     is_oriented_flag = 0
 
     image_all = np.zeros(sensor_resolution, dtype=np.uint8)
-
-
 
     for id_t, t in enumerate(times):
         sattelite_dummy_possition = measured_sattelite.at(t)
@@ -102,9 +99,9 @@ if __name__ == "__main__":
         is_oriented_flag += 1
 
         measured_data = measurement_sattelite.perform_measurements(measured_objects)
-
         image_all += measured_data['Camera']
 
+        print(measured_data)
 
         if counter >= 200:
             break
@@ -137,7 +134,6 @@ if __name__ == "__main__":
 
             sattelite_possition = measurement_sattelite.sattelite_orbit.get_sample_by_id(id_x)
             sattelite_arientation_buffer = measurement_sattelite.orientation_buffer.get_sample_by_id(id_x)
-            print(sattelite_arientation_buffer)
 
             ax.quiver(*sattelite_possition, *(sattelite_arientation_buffer[0]), length=1000,
                       color='r', normalize=True)

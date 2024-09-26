@@ -49,7 +49,7 @@ class LaserAltimeter(DummyIntrument):
             noise = self.get_noise()
             time_of_flight = self.calculate_time_of_flight(target_distance)
 
-            distance_resolution = self.calculate_distance_resolution(self._pulse_length)
+            #distance_resolution = self.calculate_distance_resolution(self._pulse_length)
 
             #if time_of_flight <= distance_resolution:
             #    return_signal = time_of_flight + noise

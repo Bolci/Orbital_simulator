@@ -86,7 +86,7 @@ class Camera(DummyIntrument):
 
         return image_points[0][0], projected_radius[0].astype(np.int32)
 
-    '''
+
     def get_image(self, measured_object: Optional) -> NDArray:
         img = np.zeros(self.resolution, dtype=np.uint8)
 
@@ -94,7 +94,7 @@ class Camera(DummyIntrument):
         cv2.circle(img, (points_to_projection), projected_radius, (255, 255, 255), -1)
 
         return img
-    '''
+
 
     def measure(self, measured_objects: Optional) -> NDArray:
         image = np.zeros(self.resolution, dtype=np.uint8)
@@ -109,7 +109,7 @@ class Camera(DummyIntrument):
 
         return image
 
-
+    """
     def get_image(self, measured_object: Optional) -> NDArray:
         img = np.zeros(self.resolution, dtype=np.uint8)
 
@@ -143,3 +143,4 @@ class Camera(DummyIntrument):
         cv2.circle(img, (points_to_projection), projected_radius, (255, 255, 255), -1)
 
         return img
+    """
