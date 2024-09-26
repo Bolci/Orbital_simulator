@@ -9,6 +9,8 @@ from sattelites.sattelite_object import SatteliteObject
 from instruments.camera import Camera
 from instruments.laser_altimeter import LaserAltimeter
 from buffers.measurement_buffer import MeasurementBuffer
+from cores.simulator_core import SimulationCore
+from cores.processing_core import ProcessingCore
 
 if __name__ == "__main__":
 
@@ -83,13 +85,22 @@ if __name__ == "__main__":
     measurement_sattelite.set_intrument_orientation_relative_to_sattelite('Laser_atimeter', np.array([0.0, 0.0, 1.0])) #TODO: does not have effect for the measurement
 
     measurement_buffer = MeasurementBuffer()
+    simulation_core = SimulationCore(measurement_buffer)
+    simulation_core.set_sattelites(measurement_sattelite, [measured_sattelite])
+
+    processing_core = ProcessingCore()
 
     ''' MAIN LOOP'''
-    image_all = np.zeros(sensor_resolution, dtype=np.uint8)
+    simulation_core.perform_simulation(times)
 
+
+
+    image_all = np.zeros(sensor_resolution, dtype=np.uint8) #TODO: WILL be deleted in the future
+
+    '''
     for id_t, t in enumerate(times):
         sattelite_dummy_possition = measured_sattelite.at(t)
-        sattelite_measurement_possition = measurement_sattelite.at(t)
+        _ = measurement_sattelite.at(t)
 
         measured_objects = [measured_sattelite]
 
@@ -105,8 +116,9 @@ if __name__ == "__main__":
             break
 
         counter += 1
-
+    '''
     measured_data_all = measurement_buffer.get_reorganized_buffer()
+
 
 
     '''PLOTTING'''
