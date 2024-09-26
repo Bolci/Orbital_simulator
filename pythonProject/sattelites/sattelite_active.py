@@ -1,5 +1,5 @@
 import numpy as np
-from utils import Utils
+from Utils.utils_vector import Utils
 from .sattelite_dummy import SatteliteDummy
 from skyfield.timelib import Time
 from typing import Optional

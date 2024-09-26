@@ -1,5 +1,5 @@
 import numpy as np
-from utils import Utils
+from Utils.utils_vector import Utils
 from scipy.optimize import newton
 
 

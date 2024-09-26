@@ -9,7 +9,7 @@ from sattelites.sattelite_active import SatteliteActive
 from sattelites.sattelite_object import SatteliteObject
 from instruments.camera import Camera
 from instruments.laser_altimeter import LaserAltimeter
-
+from buffers.measurement_buffer import MeasurementBuffer
 
 if __name__ == "__main__":
 
@@ -83,6 +83,7 @@ if __name__ == "__main__":
     measurement_sattelite.set_intrument_orientation_relative_to_sattelite('Camera', np.array([0.,0.0, 1.0]))
     measurement_sattelite.set_intrument_orientation_relative_to_sattelite('Laser_atimeter', np.array([0.0, 0.0, 1.0])) #TODO: does not have effect for the measurement
 
+    measurement_buffer = MeasurementBuffer()
 
     ''' MAIN LOOP'''
     image_all = np.zeros(sensor_resolution, dtype=np.uint8)
@@ -98,9 +99,8 @@ if __name__ == "__main__":
         is_oriented_flag += 1
 
         measured_data = measurement_sattelite.perform_measurements(measured_objects)
+        measurement_buffer.add_point(measured_data)
         image_all += measured_data['Camera']
-
-        print(measured_data)
 
         if counter >= 200:
             break

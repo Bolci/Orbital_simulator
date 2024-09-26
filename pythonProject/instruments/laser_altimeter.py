@@ -1,7 +1,6 @@
-from tester_laser import pulse_length
 from .dummy_instrument import DummyIntrument
 import numpy as np
-from utils import Utils
+from Utils.utils_vector import Utils
 
 
 class LaserAltimeter(DummyIntrument):

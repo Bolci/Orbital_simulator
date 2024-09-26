@@ -6,7 +6,7 @@ import cv2
 import sys
 
 sys.path.append("../")
-from utils import Utils
+from Utils.utils_vector import Utils
 
 
 class Camera(DummyIntrument):
