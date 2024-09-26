@@ -20,8 +20,3 @@ class MeasurementBuffer(AbstractBuffer):
 
     def get_last_point(self):
         pass
-
-
-
-
-

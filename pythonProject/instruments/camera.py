@@ -91,7 +91,7 @@ class Camera(DummyIntrument):
         img = np.zeros(self.resolution, dtype=np.uint8)
 
         points_to_projection, projected_radius = self.project_object(measured_object)
-        cv2.circle(img, (points_to_projection), projected_radius, (255, 255, 255), -1)
+        cv2.circle(img, points_to_projection, projected_radius, (255, 255, 255), -1)
 
         return img
 

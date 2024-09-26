@@ -2,6 +2,7 @@ from .abstract_buffer import AbstractBuffer
 from skyfield.timelib import Time
 from typing import Optional
 
+
 class TimeBuffer(AbstractBuffer):
     def __init__(self):
         super().__init__()

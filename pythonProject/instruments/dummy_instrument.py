@@ -15,7 +15,7 @@ class SatteliteAbstract(ABC):
         pass
 
     @abstractmethod
-    def measure(self, data_from_objects: Optional, *ars, **kwargs) -> Optional:
+    def measure(self, *ars, **kwargs) -> Optional:
         pass
 
 
