@@ -57,8 +57,9 @@ class Camera(DummyIntrument):
 
         return apparent_radius_in_pixels
 
-    def project_object(self, measured_object: Optional,
-                       relative_position: NDArray[np.float64]) -> Tuple[NDArray, int]:
+    def project_object(self, measured_object: Optional) -> Tuple[NDArray, int]:
+        relative_position = measured_object.get_current_position - self.parent_sattelite.get_current_position
+
         distance_to_satellite = Utils.norm(relative_position)
         relative_position = Utils.get_unit_vector(relative_position)
         direction_to_sattelite = Utils.get_unit_vector(relative_position)
@@ -85,16 +86,15 @@ class Camera(DummyIntrument):
 
         return image_points[0][0], projected_radius[0].astype(np.int32)
 
+    '''
     def get_image(self, measured_object: Optional) -> NDArray:
         img = np.zeros(self.resolution, dtype=np.uint8)
-        relative_position = measured_object.get_current_position - self.parent_sattelite.get_current_position
 
-        points_to_projection, projected_radius = self.project_object(measured_object, relative_position)
-
+        points_to_projection, projected_radius = self.project_object(measured_object)
         cv2.circle(img, (points_to_projection), projected_radius, (255, 255, 255), -1)
 
         return img
-
+    '''
 
     def measure(self, measured_objects: Optional) -> NDArray:
         image = np.zeros(self.resolution, dtype=np.uint8)
@@ -109,38 +109,37 @@ class Camera(DummyIntrument):
 
         return image
 
-    '''
-        def get_image(self, measured_object: Optional) -> NDArray:
-            img = np.zeros(self.resolution, dtype=np.uint8)
 
-            position_of_measured_object = measured_object.get_current_position
-            radius_of_measured_object = measured_object.get_radius
-            relative_position = position_of_measured_object - self.parent_sattelite.get_current_position
+    def get_image(self, measured_object: Optional) -> NDArray:
+        img = np.zeros(self.resolution, dtype=np.uint8)
 
-            distance_to_sattelite = Utils.norm(relative_position)
-            direction_to_sattelite = Utils.get_unit_vector(relative_position)
+        position_of_measured_object = measured_object.get_current_position
+        radius_of_measured_object = measured_object.get_radius
+        relative_position = position_of_measured_object - self.parent_sattelite.get_current_position
 
-            relative_position = np.dot(self.parent_sattelite.rotation_matrix.T, direction_to_sattelite)
-            relative_position = Utils.get_unit_vector(relative_position)
+        distance_to_sattelite = Utils.norm(relative_position)
+        direction_to_sattelite = Utils.get_unit_vector(relative_position)
 
-            rotation_matrix_to_instrument = Utils.compute_rot_between_vec(np.array([0.,0.,1.]),
-                                                                          self.relative_orientation_to_sattelite_vec)
-            relative_position = np.dot(rotation_matrix_to_instrument.T, relative_position)
-            relative_position *= distance_to_sattelite
+        relative_position = np.dot(self.parent_sattelite.rotation_matrix.T, direction_to_sattelite)
+        relative_position = Utils.get_unit_vector(relative_position)
 
-            rotation_vector = np.zeros((1,3), dtype=np.float32)
-            image_points, _ = cv2.projectPoints(np.asarray([0.,0.,0.]), rotation_vector, relative_position, self.camera_matrix,
-                                                self.distortion_coeficients)
-            image_points = image_points.astype(np.int32)
+        rotation_matrix_to_instrument = Utils.compute_rot_between_vec(np.array([0.,0.,1.]),
+                                                                      self.relative_orientation_to_sattelite_vec)
+        relative_position = np.dot(rotation_matrix_to_instrument.T, relative_position)
+        relative_position *= distance_to_sattelite
 
-            projected_radius = self.calculate_apparent_radius(self.fov_rad[::-1],
-                                                              self.resolution[::-1],
-                                                              distance=distance_to_sattelite,
-                                                              actual_radius=radius_of_measured_object)
-            projected_radius = projected_radius[0].astype(np.int32)
-            points_to_projection = image_points[0][0]
+        rotation_vector = np.zeros((1,3), dtype=np.float32)
+        image_points, _ = cv2.projectPoints(np.asarray([0.,0.,0.]), rotation_vector, relative_position, self.camera_matrix,
+                                            self.distortion_coeficients)
+        image_points = image_points.astype(np.int32)
 
-            cv2.circle(img, (points_to_projection), projected_radius, (255, 255, 255), -1)
+        projected_radius = self.calculate_apparent_radius(self.fov_rad[::-1],
+                                                          self.resolution[::-1],
+                                                          distance=distance_to_sattelite,
+                                                          actual_radius=radius_of_measured_object)
+        projected_radius = projected_radius[0].astype(np.int32)
+        points_to_projection = image_points[0][0]
 
-            return img
-        '''
+        cv2.circle(img, (points_to_projection), projected_radius, (255, 255, 255), -1)
+
+        return img

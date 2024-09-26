@@ -51,5 +51,4 @@ class SatteliteActive(SatteliteDummy):
         measured_data = {}
         for label, instrument in self.sattelite_intruments.items():
             measured_data[instrument.intrument_label] = instrument.measure(data_from_objects)
-
         return measured_data

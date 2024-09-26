@@ -35,6 +35,7 @@ if __name__ == "__main__":
 
     #laser altimeter parameters
     laser_divergence = 2e-5 #rad
+    laser_pulse_lenght = 0.001
 
     # get_sattelites_TLE
 
@@ -49,7 +50,7 @@ if __name__ == "__main__":
                                                     raan=raan2)
 
     # Load timescale
-    max_simulation_time = 120 #in minutes
+    max_simulation_time = 10 #in minutes
     ts = load.timescale()
     t0 = ts.now()
     minutes = np.linspace(0, max_simulation_time, max_simulation_time*fps*conversion)
@@ -70,6 +71,7 @@ if __name__ == "__main__":
     camera = Camera(sensor_resolution=sensor_resolution,
                     fov_deg=fov_deg)
     laser_altimeter = LaserAltimeter(beam_divergence = laser_divergence)
+    laser_altimeter.pulse_length = laser_pulse_lenght
 
     camera.assign_sattelite(measurement_sattelite)
     laser_altimeter.assign_sattelite(measurement_sattelite)
@@ -77,8 +79,8 @@ if __name__ == "__main__":
     measurement_sattelite.add_intruments('Camera', camera)
     measurement_sattelite.add_intruments('Laser_atimeter', laser_altimeter)
 
-    measurement_sattelite.set_intrument_orientation_relative_to_sattelite('Camera', np.array([0.,0.5,1.0]))
-    measurement_sattelite.set_intrument_orientation_relative_to_sattelite('Laser_atimeter', np.array([0.0, 0.2, 0.0]))
+    measurement_sattelite.set_intrument_orientation_relative_to_sattelite('Camera', np.array([0.,0.0, 1.0]))
+    measurement_sattelite.set_intrument_orientation_relative_to_sattelite('Laser_atimeter', np.array([0.0, 0.0, 1.0]))
 
     x_vals = []
     y_vals = []
@@ -93,8 +95,11 @@ if __name__ == "__main__":
     active_orientation_axis_z = []
 
     counter = 0
+    is_oriented_flag = 0
 
     image_all = np.zeros(sensor_resolution, dtype=np.uint8)
+
+
 
     for id_t, t in enumerate(times):
         sattelite_measurement_possition = measurement_sattelite.at(t)
@@ -103,9 +108,12 @@ if __name__ == "__main__":
         #sun_position = Sun.get_sun_position(t)
 
         measured_objects = [measured_sattelite]
-        measurement_sattelite.orient_instrument_on_satellite('Camera', sattelite_dummy_possition)
-        measured_data = measurement_sattelite.perform_measurements(measured_objects)
 
+        if is_oriented_flag < 2:
+            measurement_sattelite.orient_instrument_on_satellite('Camera', sattelite_dummy_possition)
+        is_oriented_flag += 1
+
+        measured_data = measurement_sattelite.perform_measurements(measured_objects)
 
         x_vals.append(sattelite_measurement_possition[0])
         y_vals.append(sattelite_measurement_possition[1])
@@ -120,6 +128,8 @@ if __name__ == "__main__":
         active_orientation_axis_z.append(measurement_sattelite.z_axis)
 
         image_all += measured_data['Camera']
+
+        print(measured_data['Laser_altimeter'])
 
 
         if counter >= 200:

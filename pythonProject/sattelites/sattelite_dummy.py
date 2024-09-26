@@ -11,6 +11,8 @@ from numpy.typing import NDArray
 import sys
 sys.path.append("../")
 
+from orbit_workers.simple_orbit import SimpleOrbit
+
 
 class SatteliteAbstract(ABC):
     @abstractmethod
@@ -29,6 +31,7 @@ class SatteliteDummy(SatteliteAbstract):
         self.tle_elem = None
         self.satellite_my = None
 
+        #orientation
         self._x_axis = np.array([1.0, 0.0, 0.0], dtype=np.float32)
         self._y_axis = np.array([0.0, 1.0, 0.0], dtype=np.float32)
         self._z_axis = np.array([0.0, 0.0, 1.0], dtype=np.float32)
@@ -36,6 +39,9 @@ class SatteliteDummy(SatteliteAbstract):
         self.rotation_matrix = np.column_stack((self._x_axis,
                                                 self._y_axis,
                                                 self._z_axis))
+
+        self._sattelite_orbit = SimpleOrbit()
+
     @property
     def x_axis(self) -> NDArray[np.float32]:
         return self._x_axis
@@ -94,6 +100,8 @@ class SatteliteDummy(SatteliteAbstract):
         exact_position = geocentric.position.km
         self.position_vector = copy(exact_position)
 
+
+        print(exact_position)
 
         return geocentric, exact_position
 
