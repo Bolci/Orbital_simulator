@@ -66,6 +66,12 @@ class SatteliteDummy(SatteliteAbstract):
     def z_axis(self, z_axis: NDArray[np.float32]) -> None:
         self._z_axis = z_axis
 
+    @property
+    def sattelite_orbit(self):
+        return self._sattelite_orbit
+
+    def get_orbit(self):
+        return self._sattelite_orbit.get_orbit()
 
     def update_rotation_by_r_matric(self, R_matrix: NDArray[np.float32]) -> None:
         self.x_axis = np.dot(R_matrix, self.x_axis)
@@ -75,7 +81,7 @@ class SatteliteDummy(SatteliteAbstract):
     @property
     def get_current_position(self) -> NDArray[np.float32]:
         ''' Returns possition vector relative to earth central coordinate system'''
-        return self.position_vector
+        return np.asarray(self._sattelite_orbit.get_last_point())
 
     @property
     def get_sattelite_orientation(self) -> NDArray[np.float32]:
@@ -98,10 +104,9 @@ class SatteliteDummy(SatteliteAbstract):
 
         geocentric = self.satellite_my.at(t)
         exact_position = geocentric.position.km
-        self.position_vector = copy(exact_position)
+        exact_position = copy(exact_position)
+        self._sattelite_orbit.add_point(*exact_position, copy(t))
 
-
-        print(exact_position)
 
         return geocentric, exact_position
 

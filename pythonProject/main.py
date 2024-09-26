@@ -1,5 +1,6 @@
 import numpy as np
 import matplotlib.pyplot as plt
+from numba.cuda.printimpl import print_item
 from skyfield.api import load
 
 from tle_worker import TLEWorker
@@ -82,14 +83,6 @@ if __name__ == "__main__":
     measurement_sattelite.set_intrument_orientation_relative_to_sattelite('Camera', np.array([0.,0.0, 1.0]))
     measurement_sattelite.set_intrument_orientation_relative_to_sattelite('Laser_atimeter', np.array([0.0, 0.0, 1.0]))
 
-    x_vals = []
-    y_vals = []
-    z_vals = []
-
-    x_vals2 = []
-    y_vals2 = []
-    z_vals2 = []
-
     active_orientation_axis_x = []
     active_orientation_axis_y = []
     active_orientation_axis_z = []
@@ -102,10 +95,8 @@ if __name__ == "__main__":
 
 
     for id_t, t in enumerate(times):
-        sattelite_measurement_possition = measurement_sattelite.at(t)
         sattelite_dummy_possition = measured_sattelite.at(t)
-
-        #sun_position = Sun.get_sun_position(t)
+        sattelite_measurement_possition = measurement_sattelite.at(t)
 
         measured_objects = [measured_sattelite]
 
@@ -115,21 +106,11 @@ if __name__ == "__main__":
 
         measured_data = measurement_sattelite.perform_measurements(measured_objects)
 
-        x_vals.append(sattelite_measurement_possition[0])
-        y_vals.append(sattelite_measurement_possition[1])
-        z_vals.append(sattelite_measurement_possition[2])
-
-        x_vals2.append(sattelite_dummy_possition[0])
-        y_vals2.append(sattelite_dummy_possition[1])
-        z_vals2.append(sattelite_dummy_possition[2])
-
         active_orientation_axis_x.append(measurement_sattelite.x_axis)
         active_orientation_axis_y.append(measurement_sattelite.y_axis)
         active_orientation_axis_z.append(measurement_sattelite.z_axis)
 
         image_all += measured_data['Camera']
-
-        print(measured_data['Laser_altimeter'])
 
 
         if counter >= 200:
@@ -143,8 +124,8 @@ if __name__ == "__main__":
     fig = plt.figure(figsize=(10, 10))
     ax = fig.add_subplot(111, projection='3d')
 
-    ax.plot(x_vals, y_vals, z_vals, label="Satellite with intruments")
-    ax.plot(x_vals2, y_vals2, z_vals2, 'magenta', label="Dummy sattelite")
+    ax.plot(*measured_sattelite.get_orbit(), label="Satellite with intruments")
+    ax.plot(*measurement_sattelite.get_orbit(), 'magenta', label="Dummy sattelite")
     ax.plot_surface(*earth, color='b', alpha=0.1)
     ax.set_xlabel('X (km)')
     ax.set_ylabel('Y (km)')
@@ -157,27 +138,19 @@ if __name__ == "__main__":
             ax.plot([x_vals[id_x], x_vals2[id_x]], [y_vals[id_x], y_vals2[id_x]], [z_vals[id_x], z_vals2[id_x]])
     '''
 
-    x_axis = np.array([1, 0, 0])
-    y_axis = np.array([0, 1, 0])
-    z_axis = np.array([0, 0, 1])
 
-    for id_x in range(len(x_vals)):
+    for id_x in range(len(times)):
         if id_x % 10 == 0:
 
-            sattelite_dummy_possition = [x_vals2[id_x], y_vals2[id_x], z_vals2[id_x]]
-            sattelite_mess_possition = [x_vals[id_x], y_vals[id_x], z_vals[id_x]]
-
-
-            ax.quiver(x_vals[id_x], y_vals[id_x], z_vals[id_x], *active_orientation_axis_x[id_x], length=1000,
+            sattelite_possition = measurement_sattelite.sattelite_orbit.get_sample_by_id(id_x)
+            ax.quiver(*sattelite_possition, *active_orientation_axis_x[id_x], length=1000,
                       color='r', normalize=True)
 
-            ax.quiver(x_vals[id_x], y_vals[id_x], z_vals[id_x], *active_orientation_axis_y[id_x], length=1000,
+            ax.quiver(*sattelite_possition, *active_orientation_axis_y[id_x], length=1000,
                       color='b', normalize=True)
 
-            ax.quiver(x_vals[id_x], y_vals[id_x], z_vals[id_x], *active_orientation_axis_z[id_x], length=1000,
+            ax.quiver(*sattelite_possition, *active_orientation_axis_z[id_x], length=1000,
                       color='g', normalize=True)
-
-            #ax.plot([x_vals[id_x], x_vals2[id_x]], [y_vals[id_x], y_vals2[id_x]], [z_vals[id_x], z_vals2[id_x]], 'magenta')
 
 
     plt.legend()
