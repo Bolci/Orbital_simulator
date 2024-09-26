@@ -9,7 +9,7 @@ from copy import copy
 import sys
 sys.path.append("../")
 
-from time_buffer import TimeBuffer
+from buffers.time_buffer import TimeBuffer
 
 
 class SatteliteActive(SatteliteDummy):

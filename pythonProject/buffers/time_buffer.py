@@ -1,12 +1,13 @@
+from .abstract_buffer import AbstractBuffer
 from skyfield.timelib import Time
 from typing import Optional
 
-class TimeBuffer:
+class TimeBuffer(AbstractBuffer):
     def __init__(self):
+        super().__init__()
         self._x_vals_buffer = []
         self._y_vals_buffer = []
         self._z_vals_buffer = []
-        self._time_history_buffer = []
 
     def get_no_samples(self) -> int:
         return len(self._x_vals_buffer)
@@ -15,12 +16,12 @@ class TimeBuffer:
         self._x_vals_buffer.append(x_val)
         self._y_vals_buffer.append(y_val)
         self._z_vals_buffer.append(z_val)
-        self._time_history_buffer.append(time)
+        self._time_buffer.append(time)
 
     def get_buffers(self) -> tuple[list, list, list]:
         return self._x_vals_buffer, self._y_vals_buffer, self._z_vals_buffer
 
-    def get_sample_by_id(self, id_x: int) -> tuple[list, list, list]:
+    def get_sample_by_id(self, id_x: int):
         return self._x_vals_buffer[id_x], self._y_vals_buffer[id_x],  self._z_vals_buffer[id_x]
 
     def get_last_point(self):
