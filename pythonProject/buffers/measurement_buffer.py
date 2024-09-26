@@ -1,5 +1,9 @@
 from .abstract_buffer import AbstractBuffer
+import sys
 
+sys.path.append("../")
+
+from utils.utils_general import UtilsGeneral
 
 class MeasurementBuffer(AbstractBuffer):
     def __init__(self):
@@ -19,6 +23,8 @@ class MeasurementBuffer(AbstractBuffer):
         self.measurement_buffer.append(measurement_values)
 
     def get_last_point(self):
-        pass
+        return_val = self.measurement_buffer[-1] if self.measurement_buffer else [0]
+        return return_val
 
-
+    def get_reorganized_buffer(self):
+        return UtilsGeneral.convert_list_of_dicts_to_dicts_of_list(self.measurement_buffer)

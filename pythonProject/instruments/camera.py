@@ -6,7 +6,7 @@ import cv2
 import sys
 
 sys.path.append("../")
-from Utils.utils_vector import Utils
+from utils.utils_vector import Utils
 
 
 class Camera(DummyIntrument):
@@ -114,13 +114,13 @@ class Camera(DummyIntrument):
         radius_of_measured_object = measured_object.get_radius
         relative_position = position_of_measured_object - self.parent_sattelite.get_current_position
 
-        distance_to_sattelite = Utils.norm(relative_position)
-        direction_to_sattelite = Utils.get_unit_vector(relative_position)
+        distance_to_sattelite = utils.norm(relative_position)
+        direction_to_sattelite = utils.get_unit_vector(relative_position)
 
         relative_position = np.dot(self.parent_sattelite.rotation_matrix.T, direction_to_sattelite)
-        relative_position = Utils.get_unit_vector(relative_position)
+        relative_position = utils.get_unit_vector(relative_position)
 
-        rotation_matrix_to_instrument = Utils.compute_rot_between_vec(np.array([0.,0.,1.]),
+        rotation_matrix_to_instrument = utils.compute_rot_between_vec(np.array([0.,0.,1.]),
                                                                       self.relative_orientation_to_sattelite_vec)
         relative_position = np.dot(rotation_matrix_to_instrument.T, relative_position)
         relative_position *= distance_to_sattelite

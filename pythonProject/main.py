@@ -1,9 +1,8 @@
 import numpy as np
 import matplotlib.pyplot as plt
-from numba.cuda.printimpl import print_item
 from skyfield.api import load
 
-from tle_worker import TLEWorker
+from orbit_workers.tle_worker import TLEWorker
 from objects import Sphere, Sun
 from sattelites.sattelite_active import SatteliteActive
 from sattelites.sattelite_object import SatteliteObject
@@ -102,10 +101,13 @@ if __name__ == "__main__":
         measurement_buffer.add_point(measured_data)
         image_all += measured_data['Camera']
 
-        if counter >= 200:
+        if counter >= 300:
             break
 
         counter += 1
+
+    measured_data_all = measurement_buffer.get_reorganized_buffer()
+
 
     '''PLOTTING'''
     plt.figure()

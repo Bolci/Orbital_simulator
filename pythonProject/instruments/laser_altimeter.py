@@ -1,6 +1,6 @@
 from .dummy_instrument import DummyIntrument
 import numpy as np
-from Utils.utils_vector import Utils
+from utils.utils_vector import Utils
 
 
 class LaserAltimeter(DummyIntrument):

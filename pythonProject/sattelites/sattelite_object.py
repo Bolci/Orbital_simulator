@@ -5,7 +5,6 @@ from skyfield.timelib import Time, Timescale
 from numpy.typing import NDArray
 sys.path.append('../')
 
-from tle_worker import TLEWorker
 
 class SatteliteObject(SatteliteWithDimension):
     def __init__(self,
@@ -54,7 +53,7 @@ class SatteliteObject(SatteliteWithDimension):
         #print(f"Position: {r}, Velocity: {v}")
         #r = np.array([r[0].to_value(u.km), r[1].to_value(u.km), r[2].to_value(u.km)])
         #v = np.array([v[0].to_value(u.km / u.s), v[1].to_value(u.km / u.s), v[2].to_value(u.km / u.s)])
-        #orbital_energy = (Utils.norm(v) ** 2 / 2) - (mu_earth / Utils.norm(r))
+        #orbital_energy = (utils.norm(v) ** 2 / 2) - (mu_earth / utils.norm(r))
         #print(F"orbital energy {orbital_energy}")
         #print(orbit.a, orbit.ecc, orbit.inc)
         #tle_creator = TLEWorker()
