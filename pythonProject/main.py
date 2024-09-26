@@ -84,7 +84,6 @@ if __name__ == "__main__":
     measurement_sattelite.set_intrument_orientation_relative_to_sattelite('Laser_atimeter', np.array([0.0, 0.0, 1.0])) #TODO: does not have effect for the measurement
 
 
-
     ''' MAIN LOOP'''
     image_all = np.zeros(sensor_resolution, dtype=np.uint8)
 
