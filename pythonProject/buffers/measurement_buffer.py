@@ -7,7 +7,7 @@ class MeasurementBuffer(AbstractBuffer):
         self.measurement_buffer = []
 
     def get_no_samples(self):
-        pass
+        return len(self.measurement_buffer)
 
     def get_sample_by_id(self, id_x: int):
         pass
@@ -20,3 +20,4 @@ class MeasurementBuffer(AbstractBuffer):
 
     def get_last_point(self):
         pass
+

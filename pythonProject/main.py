@@ -13,6 +13,7 @@ from instruments.laser_altimeter import LaserAltimeter
 
 if __name__ == "__main__":
 
+    ''' Constants and parameters'''
     # define constants
     mu = 398600.4418  # Gravitational parameter for Earth (km^3/s^2)
     earth_radius = 6378.1363  # Earth's radius in km
@@ -38,25 +39,25 @@ if __name__ == "__main__":
     laser_divergence = 2e-5 #rad
     laser_pulse_lenght = 0.001
 
+    # Load timescale
+    max_simulation_time = 10  # in minutes
+    ts = load.timescale()
+    t0 = ts.now()
+    minutes = np.linspace(0, max_simulation_time, max_simulation_time * fps * conversion)
+    times = t0 + minutes / (24 * 60)  # Convert minutes to fraction of a day
+
+    counter = 0
+    is_oriented_flag = 0
+
+    '''Inicialization of objects'''
     # get_sattelites_TLE
-
     tle_worker = TLEWorker()
-
     tle_measurement_sat = tle_worker.generate_tle(altitude=altitude,
                                                   inclination=inclination,
                                                   raan=raan)
-
     tle_measurement_sat_2 = tle_worker.generate_tle(altitude=altitude2,
                                                     inclination=inclination2,
                                                     raan=raan2)
-
-    # Load timescale
-    max_simulation_time = 10 #in minutes
-    ts = load.timescale()
-    t0 = ts.now()
-    minutes = np.linspace(0, max_simulation_time, max_simulation_time*fps*conversion)
-    times = t0 + minutes / (24 * 60)  # Convert minutes to fraction of a day
-
     # get objetcs
     earth = Sphere.get_planet(earth_radius)
     Sun = Sun()
@@ -67,7 +68,6 @@ if __name__ == "__main__":
 
     measurement_sattelite = SatteliteActive('Measurement_sattelite')
     measurement_sattelite.load_sattelite(tle_measurement_sat, ts)
-
 
     camera = Camera(sensor_resolution=sensor_resolution,
                     fov_deg=fov_deg)
@@ -83,9 +83,9 @@ if __name__ == "__main__":
     measurement_sattelite.set_intrument_orientation_relative_to_sattelite('Camera', np.array([0.,0.0, 1.0]))
     measurement_sattelite.set_intrument_orientation_relative_to_sattelite('Laser_atimeter', np.array([0.0, 0.0, 1.0])) #TODO: does not have effect for the measurement
 
-    counter = 0
-    is_oriented_flag = 0
 
+
+    ''' MAIN LOOP'''
     image_all = np.zeros(sensor_resolution, dtype=np.uint8)
 
     for id_t, t in enumerate(times):
@@ -108,6 +108,7 @@ if __name__ == "__main__":
 
         counter += 1
 
+    '''PLOTTING'''
     plt.figure()
     plt.imshow(image_all)
 
@@ -121,13 +122,6 @@ if __name__ == "__main__":
     ax.set_ylabel('Y (km)')
     ax.set_zlabel('Z (km)')
     ax.set_title("3D Orbit of Satellite")
-
-    '''
-    for id_x in range(len(x_vals)):
-        if id_x % 10 == 0:
-            ax.plot([x_vals[id_x], x_vals2[id_x]], [y_vals[id_x], y_vals2[id_x]], [z_vals[id_x], z_vals2[id_x]])
-    '''
-
 
     for id_x in range(len(times)):
         if id_x % 10 == 0:
@@ -143,7 +137,6 @@ if __name__ == "__main__":
 
             ax.quiver(*sattelite_possition, *(sattelite_arientation_buffer[2]), length=1000,
                       color='g', normalize=True)
-
 
     plt.legend()
     plt.show()
