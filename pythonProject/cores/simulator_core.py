@@ -5,6 +5,7 @@ from sattelites.sattelite_active import SatteliteActive
 from sattelites.sattelite_object import SatteliteObject
 from skyfield.timelib import Time
 
+
 class SimulationCore:
     def __init__(self, data_buffer):
 
@@ -38,11 +39,8 @@ class SimulationCore:
                 self.sattelite_active.orient_instrument_on_satellite('Camera', sattelite_dummy_possition)
             is_oriented_flag += 1
 
-
-
             if counter >= counter_max:
                 break
-
             counter += 1
 
         return self.data_buffer

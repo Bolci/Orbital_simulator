@@ -41,7 +41,7 @@ if __name__ == "__main__":
     laser_pulse_lenght = 0.001
 
     # Load timescale
-    max_simulation_time = 10  # in minutes
+    max_simulation_time = 80  # in minutes
     ts = load.timescale()
     t0 = ts.now()
     minutes = np.linspace(0, max_simulation_time, max_simulation_time * fps * conversion)
@@ -91,11 +91,10 @@ if __name__ == "__main__":
     processing_core = ProcessingCore()
 
     ''' MAIN LOOP'''
-    simulation_core.perform_simulation(times)
+    _ = simulation_core.perform_simulation(times)
+    #measured_data_all = measurement_buffer.get_reorganized_buffer()
 
-
-
-    image_all = np.zeros(sensor_resolution, dtype=np.uint8) #TODO: WILL be deleted in the future
+    #image_all = np.zeros(sensor_resolution, dtype=np.uint8) #TODO: WILL be deleted in the future
 
     '''
     for id_t, t in enumerate(times):
@@ -110,17 +109,18 @@ if __name__ == "__main__":
 
         measured_data = measurement_sattelite.perform_measurements(measured_objects)
         measurement_buffer.add_point(measured_data)
-        image_all += measured_data['Camera']
+        #image_all += measured_data['Camera']
 
         if counter >= 300:
             break
 
         counter += 1
     '''
-    measured_data_all = measurement_buffer.get_reorganized_buffer()
 
+    '''PROCESSING DATA'''
+    processed_data = processing_core.process_data(measurement_buffer)
 
-
+    image_all = processed_data["Overlapped_image"]
     '''PLOTTING'''
     plt.figure()
     plt.imshow(image_all)
