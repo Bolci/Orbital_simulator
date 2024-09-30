@@ -4,8 +4,9 @@ from copy import copy
 import sys
 
 sys.path.append("../")
-
 from utils.utils_general import UtilsGeneral
+from utils.utils_time import UtilsTime
+
 
 class MeasurementBuffer(AbstractBuffer):
     def __init__(self):
@@ -36,5 +37,9 @@ class MeasurementBuffer(AbstractBuffer):
 
     def get_reorganized_buffer(self):
         return UtilsGeneral.convert_list_of_dicts_to_dicts_of_list(self._measurement_buffer)
+
+    def get_sample_by_time(self, t: Time):
+        id_sample = UtilsTime.find_id_of_closest_time(self._time_buffer, t)
+        return self.get_sample_by_id_with_time(id_sample)
 
 

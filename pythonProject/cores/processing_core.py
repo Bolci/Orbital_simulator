@@ -2,6 +2,7 @@ import sys
 
 import matplotlib.pyplot as plt
 import numpy as np
+from numba import Optional
 
 sys.path.append('../')
 
@@ -35,7 +36,7 @@ class ProcessingCore(CoreAbstract):
 
         return []
 
-    def calculate_possition_from_image(self, image_photo: NDArray, time_stamp_of_image):
+    def calculate_possition_from_image(self, data: dict[Optional], measurement_setup: dict[Optional]):
         pass
 
 
@@ -43,7 +44,13 @@ class ProcessingCore(CoreAbstract):
                      measurement_buffer: MeasurementBuffer):
 
         time_sample = measurement_buffer._time_buffer[3]
-        self.sattelite_active.get_report_by_time(time_sample)
+
+        measurement_setup_report = self.sattelite_active.get_report_by_time(time_sample)
+        data_in_time = measurement_buffer.get_sample_by_time(time_sample)
+
+        if not (measurement_setup_report['timestamp'] == data_in_time['timestamp']):
+            raise Exception
+
 
         measured_data_all = measurement_buffer.get_reorganized_buffer()
         measured_data_all['Camera'] = measured_data_all['Camera']
