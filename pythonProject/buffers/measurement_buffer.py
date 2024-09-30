@@ -1,3 +1,4 @@
+from skyfield.timelib import Time
 from .abstract_buffer import AbstractBuffer
 import sys
 
@@ -19,8 +20,9 @@ class MeasurementBuffer(AbstractBuffer):
     def get_buffers(self):
         return self.measurement_buffer
 
-    def add_point(self, measurement_values):
+    def add_point(self, measurement_values, time_val: Time):
         self.measurement_buffer.append(measurement_values)
+        self._time_buffer.append(time_val)
 
     def get_last_point(self):
         return_val = self.measurement_buffer[-1] if self.measurement_buffer else [0]

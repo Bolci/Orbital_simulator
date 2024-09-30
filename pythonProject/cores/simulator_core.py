@@ -1,12 +1,11 @@
 import sys
 
-from numpy.lib.function_base import extract
-
 sys.path.append("../")
 
 from sattelites.sattelite_active import SatteliteActive
 from sattelites.sattelite_object import SatteliteObject
 from skyfield.timelib import Time
+from copy import copy
 
 
 class SimulationCore:
@@ -26,7 +25,7 @@ class SimulationCore:
         _ = [single_dummy.at(t) for single_dummy in self.dummy_sattelites]
 
         measured_data = self.sattelite_active.perform_measurements(self.dummy_sattelites)
-        self.data_buffer.add_point(measured_data)
+        self.data_buffer.add_point(measured_data, copy(t))
 
         return measured_data
 
@@ -42,8 +41,6 @@ class SimulationCore:
             is_oriented_flag += 1
 
             _, point = self.do_one_time_loop(t)
-
-
 
             if counter >= counter_max:
                 break

@@ -119,9 +119,10 @@ if __name__ == "__main__":
 
     for id_x, single_image in enumerate(measurement_buffer.get_buffers()):
 
-        fig = plt.figure()
-        plt.imshow(single_image['Camera'])
-        fig.savefig(f'results/image_{id_x}.png', bbox_inches='tight', pad_inches=0)
+        if id_x % 5 == 0:
+            fig = plt.figure()
+            plt.imshow(single_image['Camera'])
+            fig.savefig(f'results/image_{id_x}.png', bbox_inches='tight', pad_inches=0)
 
 
     '''PROCESSING DATA'''
@@ -144,7 +145,7 @@ if __name__ == "__main__":
     ax.set_title("3D Orbit of Satellite")
 
     for id_x in range(len(times)):
-        if id_x % 1 == 0:
+        if id_x % 10 == 0:
 
             sattelite_possition = measurement_sattelite.sattelite_orbit.get_sample_by_id(id_x)
             sattelite_arientation_buffer = measurement_sattelite.orientation_buffer.get_sample_by_id(id_x)
@@ -160,8 +161,3 @@ if __name__ == "__main__":
 
     plt.legend()
     plt.show()
-
-
-    orbit = measured_sattelite.get_orbit()
-    print(orbit[0][0])
-    print(orbit[0][-1])
