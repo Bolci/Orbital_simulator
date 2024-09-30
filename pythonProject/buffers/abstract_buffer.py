@@ -1,5 +1,7 @@
 from abc import ABC, abstractmethod
 
+from numpy.random import sample
+
 
 class AbstractBuffer(ABC):
     def __init__(self):

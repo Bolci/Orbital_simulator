@@ -89,14 +89,14 @@ if __name__ == "__main__":
     simulation_core.set_sattelites(measurement_sattelite, [measured_sattelite])
 
     processing_core = ProcessingCore()
+    simulation_core.set_sattelites(measurement_sattelite, [measured_sattelite])
 
     ''' MAIN LOOP'''
     _ = simulation_core.perform_simulation(times)
-    measured_data_all = measurement_buffer.get_reorganized_buffer()
-
-    image_all = np.zeros(sensor_resolution, dtype=np.uint8) #TODO: WILL be deleted in the future
 
     '''
+    image_all = np.zeros(sensor_resolution, dtype=np.uint8) #TODO: WILL be deleted in the future
+    
     for id_t, t in enumerate(times):
         sattelite_dummy_possition = measured_sattelite.at(t)
         _ = measurement_sattelite.at(t)
@@ -116,19 +116,21 @@ if __name__ == "__main__":
 
         counter += 1
     '''
-
-    for id_x, single_image in enumerate(measurement_buffer.get_buffers()):
+    '''
+    for id_x, single_image in enumerate(measurement_buffer.get_buffers()['Data']):
 
         if id_x % 5 == 0:
             fig = plt.figure()
             plt.imshow(single_image['Camera'])
             fig.savefig(f'results/image_{id_x}.png', bbox_inches='tight', pad_inches=0)
+    '''
 
 
     '''PROCESSING DATA'''
     processed_data = processing_core.process_data(measurement_buffer)
-
     image_all = processed_data["Overlapped_image"]
+
+
     '''PLOTTING'''
     plt.figure()
     plt.imshow(image_all)

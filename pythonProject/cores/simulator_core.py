@@ -2,23 +2,20 @@ import sys
 
 sys.path.append("../")
 
-from sattelites.sattelite_active import SatteliteActive
-from sattelites.sattelite_object import SatteliteObject
+from .core_abstract import CoreAbstract
 from skyfield.timelib import Time
 from copy import copy
+import sys
+
+sys.path.append('../')
+
+from utils.utils_time import UtilsTime
 
 
-class SimulationCore:
+class SimulationCore(CoreAbstract):
     def __init__(self, data_buffer):
-
-        self.sattelite_active = None
-        self.dummy_sattelites = None
-
+        super().__init__()
         self.data_buffer = data_buffer
-
-    def set_sattelites(self, active_sattelite: SatteliteActive, dummy_dattelites: list[SatteliteObject]):
-        self.sattelite_active = active_sattelite
-        self.dummy_sattelites = dummy_dattelites
 
     def do_one_time_loop(self, t: Time):
         self.sattelite_active.at(t)
@@ -46,4 +43,4 @@ class SimulationCore:
                 break
             counter += 1
 
-        return self.data_buffer
+        return self.data_buffer,

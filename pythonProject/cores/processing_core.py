@@ -8,11 +8,12 @@ sys.path.append('../')
 from buffers.measurement_buffer import MeasurementBuffer
 from numpy.typing import NDArray
 from utils.utils_image import ImageUtils
+from .core_abstract import CoreAbstract
 
 
-class ProcessingCore:
+class ProcessingCore(CoreAbstract):
     def __init__(self, ):
-        pass
+        super().__init__()
 
     @staticmethod
     def get_overlapped_image(image_data: list[NDArray]):
@@ -32,7 +33,14 @@ class ProcessingCore:
 
         return []
 
-    def process_data(self, measurement_buffer: MeasurementBuffer):
+    def calculate_possition_from_image(self, image_photo: NDArray, time_stamp_of_image):
+        pass
+
+    def process_data(self,
+                     measurement_buffer: MeasurementBuffer):
+        print(measurement_buffer.get_sample_by_id_with_time(0))
+        print(measurement_buffer.get_value_by_time())
+
         measured_data_all = measurement_buffer.get_reorganized_buffer()
         measured_data_all['Camera'] = measured_data_all['Camera']
 

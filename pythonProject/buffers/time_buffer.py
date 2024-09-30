@@ -1,6 +1,7 @@
 from .abstract_buffer import AbstractBuffer
 from skyfield.timelib import Time
 from typing import Optional
+from copy import copy
 
 
 class TimeBuffer(AbstractBuffer):
@@ -24,6 +25,12 @@ class TimeBuffer(AbstractBuffer):
 
     def get_sample_by_id(self, id_x: int):
         return self._x_vals_buffer[id_x], self._y_vals_buffer[id_x],  self._z_vals_buffer[id_x]
+
+    def get_sample_by_id_with_time(self, id_x: int):
+        return {'Timestamp': copy(self._time_buffer[id_x]), 'Data': {'x_val': self._x_vals_buffer[id_x],
+                                                                     'y_val': self._y_vals_buffer[id_x],
+                                                                     'z_val': self._z_vals_buffer[id_x],
+                                                                     }}
 
     def get_last_point(self):
         x_point = 0
