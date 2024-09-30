@@ -1,3 +1,5 @@
+from random import sample
+
 from .sattelite_dummy import SatteliteDummy
 import sys
 from skyfield.timelib import Time
@@ -17,6 +19,11 @@ class SatteliteWithDimension(SatteliteDummy):
     @property
     def get_radius(self) -> float:
         return self.radius
+
+    def get_report_by_time(self, time: Time):
+        sample = super().get_report_by_time(time)
+        sample['Dimensions'] = self.get_radius
+        return sample
 
     def at(self, t: Time) -> tuple[Geocentric, NDArray]:
         if self.satellite_my is None:

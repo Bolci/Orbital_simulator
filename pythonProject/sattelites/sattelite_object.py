@@ -69,6 +69,8 @@ class SatteliteObject(SatteliteWithDimension):
     def dt_time(self, t: Time):
         return (t.tt - self.get_tle_epoch().tt)
 
+    def get_report_by_time(self, time: Time) -> dict:
+        return super().get_report_by_time(time)
 
     def at(self, t: Time) -> NDArray:
         if self.satellite_my is None:

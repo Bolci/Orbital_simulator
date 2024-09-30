@@ -10,6 +10,7 @@ from numpy.typing import NDArray
 from utils.utils_image import ImageUtils
 from .core_abstract import CoreAbstract
 from data_processors.lamber_solver import LambertSolver
+from skyfield.timelib import Time
 
 
 class ProcessingCore(CoreAbstract):
@@ -40,8 +41,9 @@ class ProcessingCore(CoreAbstract):
 
     def process_data(self,
                      measurement_buffer: MeasurementBuffer):
-        print(measurement_buffer.get_sample_by_id_with_time(0))
-        print(measurement_buffer.get_value_by_time())
+
+        time_sample = measurement_buffer._time_buffer[3]
+        self.sattelite_active.get_report_by_time(time_sample)
 
         measured_data_all = measurement_buffer.get_reorganized_buffer()
         measured_data_all['Camera'] = measured_data_all['Camera']

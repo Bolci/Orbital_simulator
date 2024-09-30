@@ -1,3 +1,4 @@
+from scipy.ndimage import label
 from skyfield.sgp4lib import EarthSatellite
 import numpy as np
 from copy import copy
@@ -12,11 +13,15 @@ import sys
 sys.path.append("../")
 
 from orbit_workers.simple_orbit import SimpleOrbit
-
+from utils.utils_time import UtilsTime
 
 class SatteliteAbstract(ABC):
     @abstractmethod
     def __init__(self, *args, **kwargs) -> None:
+        pass
+
+    @abstractmethod
+    def get_report_by_time(self, time: Time) -> dict:
         pass
 
     @abstractmethod
@@ -97,6 +102,10 @@ class SatteliteDummy(SatteliteAbstract):
 
     def load_tle(self, tle: list[str]):
         self.tle_elem = tle
+
+    def get_report_by_time(self, time: Time):
+        sample = self._sattelite_orbit.get_sample_by_time(time)
+        return {'Label': self.label, 'Sattelite_position': sample}
 
     def at_raw(self, t:Time):
         if self.satellite_my is None:

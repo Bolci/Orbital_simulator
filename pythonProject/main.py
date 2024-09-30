@@ -89,7 +89,7 @@ if __name__ == "__main__":
     simulation_core.set_sattelites(measurement_sattelite, [measured_sattelite])
 
     processing_core = ProcessingCore()
-    simulation_core.set_sattelites(measurement_sattelite, [measured_sattelite])
+    processing_core.set_sattelites(measurement_sattelite, [measured_sattelite])
 
     ''' MAIN LOOP'''
     _ = simulation_core.perform_simulation(times)

@@ -3,6 +3,7 @@ import numpy as np
 
 
 def find_closest_time(buffer, target_time):
+    print(target_time)
     """
     Find the index of the closest Time object in the buffer.
 
@@ -15,6 +16,7 @@ def find_closest_time(buffer, target_time):
     """
     # Convert target time and buffer times to Julian date (JD)
     target_jd = target_time.tt.jd
+    print(target_jd)
     buffer_jd = np.array([time.tt.jd for time in buffer])
 
     # Find the index of the closest time

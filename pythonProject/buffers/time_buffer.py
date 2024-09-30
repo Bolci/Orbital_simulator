@@ -2,7 +2,10 @@ from .abstract_buffer import AbstractBuffer
 from skyfield.timelib import Time
 from typing import Optional
 from copy import copy
+import sys
+sys.path.append('../')
 
+from utils.utils_time import UtilsTime
 
 class TimeBuffer(AbstractBuffer):
     def __init__(self):
@@ -31,7 +34,6 @@ class TimeBuffer(AbstractBuffer):
                                                                      'y_val': self._y_vals_buffer[id_x],
                                                                      'z_val': self._z_vals_buffer[id_x],
                                                                      }}
-
     def get_last_point(self):
         x_point = 0
         y_point = 0
@@ -47,3 +49,7 @@ class TimeBuffer(AbstractBuffer):
             z_point = self._z_vals_buffer[-1]
 
         return x_point, y_point, z_point
+
+    def get_sample_by_time(self, t: Time):
+        id_sample = UtilsTime.find_id_of_closest_time(self._time_buffer, t)
+        return self.get_sample_by_id_with_time(id_sample)

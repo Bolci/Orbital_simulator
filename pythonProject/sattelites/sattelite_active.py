@@ -5,10 +5,8 @@ from skyfield.timelib import Time
 from typing import Optional
 from numpy.typing import NDArray
 from copy import copy
-
 import sys
 sys.path.append("../")
-
 from buffers.time_buffer import TimeBuffer
 
 
@@ -17,7 +15,6 @@ class SatteliteActive(SatteliteDummy):
         super().__init__(label)
 
         self.sattelite_intruments = {}
-        self.instrument_orientation_with_respect_to_global = {}
         self._orientation_buffer = TimeBuffer()
 
     def add_intruments(self, intrument_label: str, instrument: Optional) -> None:
@@ -31,7 +28,6 @@ class SatteliteActive(SatteliteDummy):
                                                         intrument_label: str,
                                                         orientation_vector: NDArray) -> None:
         self.sattelite_intruments[intrument_label].set_orientation_to_parent_sattelite_vec(orientation_vector)
-        self.instrument_orientation_with_respect_to_global[intrument_label] = np.dot(self.rotation_matrix, orientation_vector)
 
     def orient_instrument_on_satellite(self, intrument_label: str,
                                        target_point_vector: NDArray) -> None:
@@ -42,13 +38,23 @@ class SatteliteActive(SatteliteDummy):
                                                                 target_point_vector,
                                                                 intrument_local_orienation,
                                                                 self.rotation_matrix)
-
         self.rotation_matrix = current_rotation
-
-        self.instrument_orientation_with_respect_to_global[intrument_label] = \
-            np.dot(d_rotation, self.instrument_orientation_with_respect_to_global[intrument_label])
-
         self.update_rotation_by_r_matric(d_rotation)
+
+    def get_report_by_time(self, time: Time):
+        sample = super().get_report_by_time(time)
+        
+        orientation_sample = self._orientation_buffer.get_sample_by_time(time)
+        sample['Satellite_orientation'] = orientation_sample
+        instruments_orientation = {}
+
+        for label, instrument in self.sattelite_intruments.items():
+            instruments_orientation[label] = instrument.get_orientation_to_parent_sattelite_vec()
+
+        sample['Instruments_orientation'] = instruments_orientation
+        return sample
+
+
 
     def at(self, t: Time) -> NDArray:
         if self.satellite_my is None:
