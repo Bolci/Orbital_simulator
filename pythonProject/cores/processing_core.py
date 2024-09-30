@@ -9,6 +9,7 @@ from buffers.measurement_buffer import MeasurementBuffer
 from numpy.typing import NDArray
 from utils.utils_image import ImageUtils
 from .core_abstract import CoreAbstract
+from data_processors.lamber_solver import LambertSolver
 
 
 class ProcessingCore(CoreAbstract):
@@ -35,6 +36,7 @@ class ProcessingCore(CoreAbstract):
 
     def calculate_possition_from_image(self, image_photo: NDArray, time_stamp_of_image):
         pass
+
 
     def process_data(self,
                      measurement_buffer: MeasurementBuffer):

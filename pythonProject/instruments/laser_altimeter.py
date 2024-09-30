@@ -39,7 +39,6 @@ class LaserAltimeter(DummyIntrument):
 
         return_distances = []
         for measured_object in measured_objects:
-            return_signal = 0
 
             relative_position = self.parent_sattelite.get_current_position - measured_object.get_current_position
             relative_distance = Utils.norm(relative_position)
@@ -47,11 +46,6 @@ class LaserAltimeter(DummyIntrument):
 
             noise = self.get_noise()
             time_of_flight = self.calculate_time_of_flight(target_distance)
-
-            #distance_resolution = self.calculate_distance_resolution(self._pulse_length)
-
-            #if time_of_flight <= distance_resolution:
-            #    return_signal = time_of_flight + noise
 
             return_signal = time_of_flight + noise
             return_distances.append(return_signal)
