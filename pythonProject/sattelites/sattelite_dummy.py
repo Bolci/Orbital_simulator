@@ -98,15 +98,19 @@ class SatteliteDummy(SatteliteAbstract):
     def load_tle(self, tle: list[str]):
         self.tle_elem = tle
 
-    def at(self, t: Time) -> tuple[Geocentric, NDArray]:
+    def at_raw(self, t:Time):
         if self.satellite_my is None:
             raise Exception("Satellite data not loaded")
 
         geocentric = self.satellite_my.at(t)
         exact_position = geocentric.position.km
         exact_position = copy(exact_position)
-        self._sattelite_orbit.add_point(*exact_position, copy(t))
 
+        return geocentric, exact_position
+
+    def at(self, t: Time) -> tuple[Geocentric, NDArray]:
+        geocentric, exact_position = self.at_raw(t)
+        self._sattelite_orbit.add_point(*exact_position, copy(t))
 
         return geocentric, exact_position
 

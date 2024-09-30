@@ -11,4 +11,5 @@ tester_laser.py
 main_tester.py
 **/__pycache__
 **/de421.bsp
-
+pythonProject/results/*
+pythonProject/results/.gitkeep

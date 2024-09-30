@@ -34,7 +34,7 @@ class ProcessingCore:
 
     def process_data(self, measurement_buffer: MeasurementBuffer):
         measured_data_all = measurement_buffer.get_reorganized_buffer()
-        measured_data_all['Camera'] = measured_data_all['Camera'][2:]
+        measured_data_all['Camera'] = measured_data_all['Camera']
 
         overlapped_image = self.get_overlapped_image(measured_data_all['Camera'])
         data = self.process_images(measured_data_all['Camera'])

@@ -41,7 +41,7 @@ if __name__ == "__main__":
     laser_pulse_lenght = 0.001
 
     # Load timescale
-    max_simulation_time = 80  # in minutes
+    max_simulation_time = 20  # in minutes
     ts = load.timescale()
     t0 = ts.now()
     minutes = np.linspace(0, max_simulation_time, max_simulation_time * fps * conversion)
@@ -92,9 +92,9 @@ if __name__ == "__main__":
 
     ''' MAIN LOOP'''
     _ = simulation_core.perform_simulation(times)
-    #measured_data_all = measurement_buffer.get_reorganized_buffer()
+    measured_data_all = measurement_buffer.get_reorganized_buffer()
 
-    #image_all = np.zeros(sensor_resolution, dtype=np.uint8) #TODO: WILL be deleted in the future
+    image_all = np.zeros(sensor_resolution, dtype=np.uint8) #TODO: WILL be deleted in the future
 
     '''
     for id_t, t in enumerate(times):
@@ -103,7 +103,7 @@ if __name__ == "__main__":
 
         measured_objects = [measured_sattelite]
 
-        if is_oriented_flag < 2:
+        if is_oriented_flag < 1:
             measurement_sattelite.orient_instrument_on_satellite('Camera', sattelite_dummy_possition)
         is_oriented_flag += 1
 
@@ -116,6 +116,13 @@ if __name__ == "__main__":
 
         counter += 1
     '''
+
+    for id_x, single_image in enumerate(measurement_buffer.get_buffers()):
+
+        fig = plt.figure()
+        plt.imshow(single_image['Camera'])
+        fig.savefig(f'results/image_{id_x}.png', bbox_inches='tight', pad_inches=0)
+
 
     '''PROCESSING DATA'''
     processed_data = processing_core.process_data(measurement_buffer)
@@ -137,7 +144,7 @@ if __name__ == "__main__":
     ax.set_title("3D Orbit of Satellite")
 
     for id_x in range(len(times)):
-        if id_x % 10 == 0:
+        if id_x % 1 == 0:
 
             sattelite_possition = measurement_sattelite.sattelite_orbit.get_sample_by_id(id_x)
             sattelite_arientation_buffer = measurement_sattelite.orientation_buffer.get_sample_by_id(id_x)
@@ -155,4 +162,6 @@ if __name__ == "__main__":
     plt.show()
 
 
-
+    orbit = measured_sattelite.get_orbit()
+    print(orbit[0][0])
+    print(orbit[0][-1])
