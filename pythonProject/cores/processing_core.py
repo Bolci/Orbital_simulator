@@ -2,7 +2,7 @@ import sys
 
 import matplotlib.pyplot as plt
 import numpy as np
-from numba import Optional
+from typing import Optional
 
 sys.path.append('../')
 
@@ -12,7 +12,7 @@ from utils.utils_image import ImageUtils
 from .core_abstract import CoreAbstract
 from data_processors.lamber_solver import LambertSolver
 from skyfield.timelib import Time
-
+from exceptions.exceptions import SamplingException
 
 class ProcessingCore(CoreAbstract):
     def __init__(self, ):
@@ -48,9 +48,10 @@ class ProcessingCore(CoreAbstract):
         measurement_setup_report = self.sattelite_active.get_report_by_time(time_sample)
         data_in_time = measurement_buffer.get_sample_by_time(time_sample)
 
-        if not (measurement_setup_report['timestamp'] == data_in_time['timestamp']):
-            raise Exception
+        if not (measurement_setup_report['Timestamp'] == data_in_time['Timestamp']):
+            raise SamplingException('Timestamp for report and data are not the same')
 
+        self.calculate_possition_from_image(data_in_time, measurement_setup_report)
 
         measured_data_all = measurement_buffer.get_reorganized_buffer()
         measured_data_all['Camera'] = measured_data_all['Camera']
