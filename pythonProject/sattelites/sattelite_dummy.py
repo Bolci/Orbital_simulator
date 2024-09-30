@@ -105,7 +105,7 @@ class SatteliteDummy(SatteliteAbstract):
 
     def get_report_by_time(self, time: Time):
         sample = self._sattelite_orbit.get_sample_by_time(time)
-        return {'Label': self.label, 'Sattelite_position': sample}
+        return {'Label': self.label, 'Sattelite_position': sample['Data'], 'Timestamp': sample['Timestamp']}
 
     def at_raw(self, t:Time):
         if self.satellite_my is None:

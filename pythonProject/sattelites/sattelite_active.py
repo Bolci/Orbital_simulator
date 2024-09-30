@@ -43,17 +43,19 @@ class SatteliteActive(SatteliteDummy):
 
     def get_report_by_time(self, time: Time):
         sample = super().get_report_by_time(time)
-        
         orientation_sample = self._orientation_buffer.get_sample_by_time(time)
-        sample['Satellite_orientation'] = orientation_sample
+
+        if not (orientation_sample['Timestamp'].tt == sample['Timestamp'].tt):
+            raise Exception("Inccorect sampling from buffers")
+
+        sample['Satellite_orientation'] = orientation_sample['Data']
         instruments_orientation = {}
 
         for label, instrument in self.sattelite_intruments.items():
             instruments_orientation[label] = instrument.get_orientation_to_parent_sattelite_vec()
-
         sample['Instruments_orientation'] = instruments_orientation
-        return sample
 
+        return sample
 
 
     def at(self, t: Time) -> NDArray:
