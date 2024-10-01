@@ -7,6 +7,7 @@ import sys
 
 sys.path.append("../")
 from utils.utils_vector import Utils
+from utils.utils_camera import UtilsCamera
 
 
 class Camera(DummyIntrument):
@@ -22,7 +23,7 @@ class Camera(DummyIntrument):
         self.fov_deg = np.asarray(fov_deg)
         self.fov_rad = np.deg2rad(self.fov_deg)
 
-        self.arcsec_per_pixel = self.calculate_arcseconds_per_pixel(self.fov_deg, self.resolution)
+        self.arcsec_per_pixel = UtilsCamera.calculate_arcseconds_per_pixel(self.fov_deg, self.resolution)
         self.rad_per_pixel = self.arcsec_per_pixel * self.arcsec_to_rad
         self.max_view_km = max_view_km
 
@@ -36,25 +37,6 @@ class Camera(DummyIntrument):
     @property
     def get_camera_matrix(self) -> NDArray[np.float64]:
         return self.camera_matrix
-
-    @staticmethod
-    def calculate_arcseconds_per_pixel(fov_degrees: NDArray[np.float32],
-                                       resolution_pixels: NDArray[np.float32]) -> NDArray[np.float32]:
-        fov_arcseconds = fov_degrees * 3600
-        arcsec_per_pixel = fov_arcseconds / resolution_pixels
-        return arcsec_per_pixel
-
-    @staticmethod
-    def calculate_apparent_radius(fov_rad: NDArray,
-                                  resolution_x: NDArray,
-                                  distance: float,
-                                  actual_radius: float) -> int:
-        visible_size = 2 * (distance * np.tan(fov_rad / 2)) # Calculate the visible size at the given distance (using half of the FOV for calculation)
-        apparent_radius = actual_radius * distance / np.sqrt(distance ** 2 + actual_radius ** 2) # Calculate the apparent radius using geometric projection
-        pixels_per_unit = resolution_x / visible_size # Calculate pixels per unit (for x-axis)
-        apparent_radius_in_pixels = apparent_radius * pixels_per_unit # Calculate the apparent radius in pixels
-
-        return apparent_radius_in_pixels
 
     def project_object(self, measured_object: Optional) -> Tuple[NDArray, int]:
         relative_position = measured_object.get_current_position - self.parent_sattelite.get_current_position
@@ -78,7 +60,7 @@ class Camera(DummyIntrument):
         image_points = image_points.astype(np.int32)
 
 
-        projected_radius = self.calculate_apparent_radius(self.fov_rad[::-1],
+        projected_radius = UtilsCamera.calculate_apparent_radius(self.fov_rad[::-1],
                                                           self.resolution[::-1],
                                                           distance=distance_to_satellite,
                                                           actual_radius=measured_object.get_radius)
