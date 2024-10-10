@@ -53,3 +53,8 @@ class TimeBuffer(AbstractBuffer):
     def get_sample_by_time(self, t: Time):
         id_sample = UtilsTime.find_id_of_closest_time(self._time_buffer, t)
         return self.get_sample_by_id_with_time(id_sample)
+
+
+    def clean(self):
+        self._x_vals_buffer, self._y_vals_buffer, self._z_vals_buffer  = [], [], []
+        self._time_buffer = []

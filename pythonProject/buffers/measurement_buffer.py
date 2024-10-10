@@ -42,4 +42,6 @@ class MeasurementBuffer(AbstractBuffer):
         id_sample = UtilsTime.find_id_of_closest_time(self._time_buffer, t)
         return self.get_sample_by_id_with_time(id_sample)
 
-
+    def clean(self):
+        self._measurement_buffer = []
+        self._time_buffer = []

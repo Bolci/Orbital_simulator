@@ -15,13 +15,15 @@ class Camera(DummyIntrument):
                  sensor_resolution: tuple,
                  fov_deg: tuple,
                  max_view_km: float =1000.0,
-                 distortion_coeficients: tuple = (0.0,0.0,0.0,0.0)) -> None:
+                 distortion_coeficients: tuple = (0.0,0.0,0.0,0.0),
+                 camera_uncertanity_in_km: int = 0.1) -> None:
         super().__init__(intrument_label="Camera")
 
         self.arcsec_to_rad = 4.84814e-6  # s
         self.resolution = np.asarray(sensor_resolution)
         self.fov_deg = np.asarray(fov_deg)
         self.fov_rad = np.deg2rad(self.fov_deg)
+        self.camera_uncertanity_in_km = camera_uncertanity_in_km
 
         self.arcsec_per_pixel = UtilsCamera.calculate_arcseconds_per_pixel(self.fov_deg, self.resolution)
         self.rad_per_pixel = self.arcsec_per_pixel * self.arcsec_to_rad
@@ -34,9 +36,20 @@ class Camera(DummyIntrument):
                                               [0, 0, 1]], dtype=np.float32)
         self.distortion_coeficients = np.asarray(distortion_coeficients)
 
+        self.flag = 0
+
     @property
     def get_camera_matrix(self) -> NDArray[np.float64]:
         return self.camera_matrix
+
+    def sample_uncertanity(self):
+        return np.random.normal(self.camera_uncertanity_in_km, 3)
+
+    def get_camera_report(self):
+        return {'camera_intrinsics': {'fx': self.focal_length_xy[1],
+                                      'fy': self.focal_length_xy[0],
+                                      'cx': self.resolution[1]//2,
+                                      'cy': self.resolution[0]//2}}
 
     def project_object(self, measured_object: Optional) -> Tuple[NDArray, int]:
         relative_position = measured_object.get_current_position - self.parent_sattelite.get_current_position
@@ -53,12 +66,14 @@ class Camera(DummyIntrument):
         relative_position = np.dot(rotation_matrix_to_instrument.T, relative_position)
         relative_position *= distance_to_satellite
 
+        #add errors to image
+        relative_position += self.sample_uncertanity()
+
         rotation_vector = np.zeros((1, 3), dtype=np.float32)
         image_points, _ = cv2.projectPoints(np.asarray([0., 0., 0.]), rotation_vector, relative_position,
                                             self.camera_matrix,
                                             self.distortion_coeficients)
         image_points = image_points.astype(np.int32)
-
 
         projected_radius = UtilsCamera.calculate_apparent_radius(self.fov_rad[::-1],
                                                           self.resolution[::-1],

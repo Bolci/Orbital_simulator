@@ -10,16 +10,11 @@ class SatteliteObject(SatteliteWithDimension):
     def __init__(self,
                  label: str,
                  position_degradation_speed_km:float = 0.2,
-                 drift_speed_km_per_sec:float = 0.01,
                  initial_uncertainty_km:float = 1.0,
-                 initial_velocity_uncertenaity_kms:float = 0.001,
                  radius:float = 0.05) -> None:
         super().__init__(label, radius)
 
-        self.initial_velocity_uncertenaity_kms = initial_velocity_uncertenaity_kms
         self.initial_uncertainty_km = initial_uncertainty_km
-
-        self.drift_speed_km_per_sec = drift_speed_km_per_sec
         self.position_degradation_speed_km = position_degradation_speed_km
 
         self.tle_true = None
@@ -28,6 +23,9 @@ class SatteliteObject(SatteliteWithDimension):
     @staticmethod
     def sample_from_uncertainity(parameter) -> NDArray:
         return np.random.uniform(-1, 1, size=3) * parameter
+
+    #def assign_ini_position(self, true_position: NDArray, calculated_time):
+    #    pass
 
     def load_sattelite(self, tle: list[str], ts: Timescale) -> None:
         super().load_sattelite(tle, ts)

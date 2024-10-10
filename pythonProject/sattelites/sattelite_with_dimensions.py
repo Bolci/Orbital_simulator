@@ -5,6 +5,7 @@ import sys
 from skyfield.timelib import Time
 from skyfield.positionlib import Geocentric
 from numpy.typing import NDArray
+import numpy as np
 
 sys.path.append("../")
 from objects import Sphere
@@ -15,6 +16,7 @@ class SatteliteWithDimension(SatteliteDummy):
         super().__init__(label)
         self.radius = radius
         self.satt_object = Sphere.get_planet(radius)
+        self.ini_position = np.array([0.,0.,0.])
 
     @property
     def get_radius(self) -> float:
@@ -32,3 +34,5 @@ class SatteliteWithDimension(SatteliteDummy):
         geocentric, exact_position = super().at(t)
 
         return geocentric, exact_position
+
+

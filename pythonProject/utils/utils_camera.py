@@ -1,29 +1,27 @@
 import numpy as np
 from numpy.typing import NDArray
+from utils.utils_vector import Utils
 
 
 class UtilsCamera:
     @staticmethod
-    def pixel_to_los(pixel_coords, camera_intrinsics, camera_orientation):
-        # This function will convert pixel coordinates into a 3D LoS vector based on camera intrinsic parameters
-        # camera_intrinsics contains fx, fy, cx, cy (focal length and principal point)
-        # camera_orientation contains rotation matrix to world coordinates
+    def pixel_to_los(pixel_coords,
+                     camera_intrinsics):
+        #expected that camera is pointing towards zaxis derection
+        ##TODO: take position in account
 
         fx, fy, cx, cy = camera_intrinsics
-        x, y = pixel_coords
+        x,y = pixel_coords
 
-        # Normalize pixel coordinates (to camera frame)
+        if x == None:
+            x = 0
+            y = 0
+
         norm_x = (x - cx) / fx
         norm_y = (y - cy) / fy
+        los_camera_frame = np.asarray([norm_x, norm_y, 1])
 
-        # Assume a focal length of 1 unit in the camera z-axis (camera frame)
-        los_camera_frame = np.array([norm_x, norm_y, 1.0])
-
-        # Rotate the LoS vector to the world (ECI) frame using the camera orientation
-        los_world_frame = np.dot(camera_orientation, los_camera_frame)
-
-        # Normalize the vector to get the direction (LoS)
-        return los_world_frame / np.linalg.norm(los_world_frame)
+        return los_camera_frame
 
     @staticmethod
     def calculate_arcseconds_per_pixel(fov_degrees: NDArray[np.float32],

@@ -1,6 +1,8 @@
+import matplotlib.pyplot as plt
 from numpy.typing import NDArray
 import cv2
 import numpy as np
+from scipy.ndimage import center_of_mass
 
 
 class ImageUtils:
@@ -9,8 +11,6 @@ class ImageUtils:
         x_center, y_center = None, None
 
         if not np.sum(image) == 0:
-            moments = cv2.moments(image, binaryImage=True)
-            x_center = int(moments['m10'] / moments['m00'])
-            y_center = int(moments['m01'] / moments['m00'])
+            y_center, x_center = center_of_mass(image)
 
         return x_center, y_center

@@ -118,6 +118,7 @@ class SatteliteDummy(SatteliteAbstract):
         return geocentric, exact_position
 
     def at(self, t: Time) -> tuple[Geocentric, NDArray]:
+
         geocentric, exact_position = self.at_raw(t)
         self._sattelite_orbit.add_point(*exact_position, copy(t))
 
@@ -125,3 +126,6 @@ class SatteliteDummy(SatteliteAbstract):
 
     def __call__(self) -> EarthSatellite:
         return self.satellite_my
+
+    def clean_data(self):
+        self._sattelite_orbit = SimpleOrbit()

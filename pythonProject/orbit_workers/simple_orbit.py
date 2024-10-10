@@ -11,3 +11,6 @@ class SimpleOrbit(TimeBuffer):
 
     def get_orbit(self):
         return super().get_buffers()
+
+    def get_first_point(self):
+        return self.get_sample_by_id(0)

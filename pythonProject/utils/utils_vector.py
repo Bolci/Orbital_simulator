@@ -1,12 +1,18 @@
 import numpy as np
 from scipy.spatial.transform import Rotation as R
 from numpy.typing import NDArray
+from utils.utils_report import UtilsReport
 
 
 class Utils:
     @staticmethod
     def norm(vec: NDArray) -> NDArray:
         return np.sqrt(np.dot(vec, vec))
+
+    @staticmethod
+    def local_to_global_vector(local_vector: NDArray, R: NDArray, t: NDArray):
+        global_vector = R @ local_vector + t
+        return global_vector
 
     @staticmethod
     def get_unit_vector(vector: NDArray) -> NDArray:
@@ -95,3 +101,10 @@ class Utils:
     @staticmethod
     def convert_quaternion_to_rotation_matrix(quaternion: NDArray) -> NDArray:
         return R.from_quat(quaternion).as_matrix()
+
+    @staticmethod
+    def los_to_ra_dec(los_vector):
+        x, y, z = los_vector
+        ra = np.arctan2(y, x)
+        dec = np.arcsin(z / np.linalg.norm(los_vector))
+        return ra, dec

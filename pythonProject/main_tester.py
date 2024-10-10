@@ -1,41 +1,40 @@
-from astropy.time import Time
-import numpy as np
+from org.orekit.bodies import OneAxisEllipsoid
+from org.orekit.forces.gravity.potential import GravityFieldFactory
+from org.orekit.forces.gravity import HolmesFeatherstoneAttractionModel
+from org.orekit.forces.drag import DragForce
+from org.orekit.forces.radiation import SolarRadiationPressure
+from org.orekit.propagation.numerical import NumericalPropagator
+from org.orekit.frames import FramesFactory
+from org.orekit.time import AbsoluteDate
+from org.orekit.orbits import KeplerianOrbit, OrbitType, PositionAngleType
+from org.orekit.propagation.analytical.tle import TLE
+from org.orekit.utils import Constants
 
+# Define the initial TLE orbit
+tle = TLE("TLE_LINE1", "TLE_LINE2")
+initialOrbit = tle.getOrbit()
 
-def find_closest_time(buffer, target_time):
-    print(target_time)
-    """
-    Find the index of the closest Time object in the buffer.
+# Set up the frame, gravitational model, and atmosphere
+earth = OneAxisEllipsoid(Constants.WGS84_EARTH_EQUATORIAL_RADIUS,
+                         Constants.WGS84_EARTH_FLATTENING,
+                         FramesFactory.getITRF())
+gravityField = GravityFieldFactory.getNormalizedProvider(10, 10)
+gravityModel = HolmesFeatherstoneAttractionModel(earth.getBodyFrame(), gravityField)
 
-    Parameters:
-    buffer (list): List of Time objects.
-    target_time (Time): Target Time object.
+# Initialize the propagator
+propagator = NumericalPropagator(gravityModel)
 
-    Returns:
-    int: Index of the closest Time object in the buffer.
-    """
-    # Convert target time and buffer times to Julian date (JD)
-    target_jd = target_time.tt.jd
-    print(target_jd)
-    buffer_jd = np.array([time.tt.jd for time in buffer])
+# Define drag model (atmospheric drag example)
+#dragForce = DragForce(HarrisPriester(earth), 2.2)  # 2.2 is the drag coefficient
+#propagator.addForceModel(dragForce)
 
-    # Find the index of the closest time
-    closest_idx = (np.abs(buffer_jd - target_jd)).argmin()
+# Set the orbit type
+propagator.setOrbitType(OrbitType.KEPLERIAN)
 
-    return closest_idx
+# Propagate the orbit for a given time
+finalDate = AbsoluteDate.now().shiftedBy(86400.0)  # 1 day later
+pvCoordinates = propagator.getPVCoordinates(finalDate, FramesFactory.getICRF())
 
-
-# Example usage
-buffer = [
-    Time(2460584.018346552, format='jd', scale='tt'),
-    Time(2460584.019077546, format='jd', scale='tt'),
-    Time(2460584.01980854, format='jd', scale='tt'),
-    Time(2460584.0205395343, format='jd', scale='tt'),
-    Time(2460584.0212705284, format='jd', scale='tt'),
-    Time(2460584.0220015226, format='jd', scale='tt'),
-    Time(2460584.0227325168, format='jd', scale='tt')
-]
-
-target_time = Time(2460584.0205395345, format='jd', scale='tt')
-index = find_closest_time(buffer, target_time)
-print(f"Index of closest time: {index}")
+# Print the propagated position and velocity
+print("Propagated position:", pvCoordinates.getPosition())
+print("Propagated velocity:", pvCoordinates.getVelocity())

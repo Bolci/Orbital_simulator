@@ -30,8 +30,9 @@ class SatteliteActive(SatteliteDummy):
         self.sattelite_intruments[intrument_label].set_orientation_to_parent_sattelite_vec(orientation_vector)
 
     def orient_instrument_on_satellite(self, intrument_label: str,
-                                       target_point_vector: NDArray) -> None:
-        sattelite_location = self.get_current_position
+                                       target_point_vector: NDArray,
+                                       sattelite_loc = np.array([])) -> None:
+        sattelite_location = self.get_current_position if (len(sattelite_loc) == 0) else sattelite_loc
         intrument_local_orienation = self.sattelite_intruments[intrument_label].relative_orientation_to_sattelite_vec
 
         current_rotation, d_rotation = Utils.update_orientation(sattelite_location,
@@ -73,3 +74,8 @@ class SatteliteActive(SatteliteDummy):
         for label, instrument in self.sattelite_intruments.items():
             measured_data[instrument.intrument_label] = instrument.measure(data_from_objects)
         return measured_data
+
+    def clean_data(self):
+        super().clean_data()
+        self._orientation_buffer = TimeBuffer()
+
