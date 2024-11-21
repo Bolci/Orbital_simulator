@@ -104,11 +104,11 @@ if __name__ == "__main__":
     for id_it in range(1):
         ''' MAIN LOOP'''
         _ = simulation_core.perform_simulation(times)
-        #image_all = np.zeros(sensor_resolution, dtype=np.uint8) #TODO: WILL be deleted in the future
+        data_saver.save_raw_data(measurement_buffer, id_it)
 
         '''PROCESSING DATA'''
         processed_data = processing_core.process_data(measurement_buffer)
-        data_saver.save_data(measurement_buffer, processed_data, id_it)
+
         image_all = processed_data["Overlapped_image"]
 
         '''PLOTTING'''

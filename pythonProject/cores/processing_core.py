@@ -56,21 +56,34 @@ class ProcessingCore(CoreAbstract):
 
         return los
 
+    @staticmethod
+    def extract_coordinates_to_list(coordinates: dict) -> list:
+        return [coordinates['x_val'], coordinates['z_val'], coordinates['z_val']]
+
 
     def process_data(self,
                      measurement_buffer: MeasurementBuffer):
 
         time_buf = 0
-        predicted_positions_from_laser = []
-        dts = []
+
+        sattelite_possitions_buffer = []
+        angles_buffer = []
+        time_stamp_buffer = []
 
         no_sammples = measurement_buffer.get_no_samples()
+
+        break_condition = 4
+        counter = 0
 
         for id_t_sample in range(no_sammples):
             measured_data, time = measurement_buffer.get_sample_by_id(id_t_sample)
             time_iso_format = UtilsTime.julian_date_to_iso8601(time)
 
             measurement_setup_report = self.sattelite_active.get_report_by_time(time)
+
+            positions_of_sattelite = measurement_setup_report['Sattelite_position']
+            positions_of_sattelite_list = self.extract_coordinates_to_list(positions_of_sattelite)
+
             sattelite_time_stamp = measurement_setup_report['Timestamp']
 
             if not (sattelite_time_stamp == time):
@@ -80,7 +93,15 @@ class ProcessingCore(CoreAbstract):
             los_transformed = UtilsCamera.transform_to_inertial(los)
             ra, dec = UtilsCamera.calculate_ra_dec(los_transformed)
 
-            
+            sattelite_possitions_buffer.append(positions_of_sattelite_list)
+            angles_buffer.append([ra, dec])
+            time_stamp_buffer.append(time_iso_format)
+
+            if counter >= break_condition:
+                break
+
+            counter += 1
+
 
 
 
