@@ -32,16 +32,13 @@ class LaserAltimeter(DummyIntrument):
         self.pulse_length = pulse_length
 
     def measure(self, measured_objects, *args):
-
         return_distances = []
         for measured_object in measured_objects:
-
             relative_position = self.parent_sattelite.get_current_position - measured_object.get_current_position
             relative_distance = Utils.norm(relative_position)
             target_distance = relative_distance  #distance in meters
-            #return_signal = [target_distance]
-
-            return_signal = target_distance + self.get_noise()
+            return_signal = [target_distance]
+            #return_signal = target_distance + self.get_noise()
 
             return_distances.append(return_signal)
 

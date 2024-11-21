@@ -17,7 +17,7 @@ class MeasurementBuffer(AbstractBuffer):
         return len(self._measurement_buffer)
 
     def get_sample_by_id(self, id_x: int):
-        return self._measurement_buffer[id_x]
+        return self._measurement_buffer[id_x], self._time_buffer[id_x]
 
     def get_sample_by_id_with_time(self, id_x: int):
         return {'Timestamp': copy(self._time_buffer[id_x]), 'Data': self._measurement_buffer[id_x]}

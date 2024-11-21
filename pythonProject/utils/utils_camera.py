@@ -4,11 +4,11 @@ from utils.utils_vector import Utils
 
 
 class UtilsCamera:
+
     @staticmethod
     def pixel_to_los(pixel_coords,
                      camera_intrinsics):
         #expected that camera is pointing towards zaxis derection
-        ##TODO: take position in account
 
         fx, fy, cx, cy = camera_intrinsics
         x,y = pixel_coords
@@ -20,8 +20,29 @@ class UtilsCamera:
         norm_x = (x - cx) / fx
         norm_y = (y - cy) / fy
         los_camera_frame = np.asarray([norm_x, norm_y, 1])
+        los_camera_frame = Utils.get_unit_vector(los_camera_frame)
 
         return los_camera_frame
+
+    @staticmethod
+    def transform_to_inertial(los_camera, rotation_matrix = np.eye(3)):
+        """
+        Transform LOS vector from the camera frame to the inertial frame.
+        :param los_camera: Line-of-sight vector in the camera frame
+        :param rotation_matrix: 3x3 rotation matrix from camera to inertial frame
+        :return: Line-of-sight vector in the inertial frame
+        """
+        los_inertial = rotation_matrix @ los_camera
+        return los_inertial / np.linalg.norm(los_inertial)
+
+    @staticmethod
+    def calculate_ra_dec(los_vector):
+        x, y, z = los_vector
+        dec = np.arcsin(z) * (180.0 / np.pi)
+        ra = np.arctan2(y, x) * (180.0 / np.pi)
+        if ra < 0:
+            ra += 360.0  # Ensure RA is in [0, 360)
+        return ra, dec
 
     @staticmethod
     def calculate_arcseconds_per_pixel(fov_degrees: NDArray[np.float32],

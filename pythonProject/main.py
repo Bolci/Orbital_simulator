@@ -51,6 +51,7 @@ if __name__ == "__main__":
     max_simulation_time = 40  # in minutes
     ts = load.timescale()
     t0 = ts.now()
+
     minutes = np.linspace(0, max_simulation_time, max_simulation_time * fps * conversion)
     times = t0 + minutes / (24 * 60)  # Convert minutes to fraction of a day
 
@@ -139,7 +140,7 @@ if __name__ == "__main__":
                           color='g', normalize=True)
 
         plt.legend()
-        plt.show()
+        #plt.show()
 
         measurement_buffer.clean()
         measurement_sattelite.clean_data()

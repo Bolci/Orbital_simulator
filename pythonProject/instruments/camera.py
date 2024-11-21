@@ -67,7 +67,7 @@ class Camera(DummyIntrument):
         relative_position *= distance_to_satellite
 
         #add errors to image
-        relative_position += self.sample_uncertanity()
+        #relative_position += self.sample_uncertanity()
 
         rotation_vector = np.zeros((1, 3), dtype=np.float32)
         image_points, _ = cv2.projectPoints(np.asarray([0., 0., 0.]), rotation_vector, relative_position,
